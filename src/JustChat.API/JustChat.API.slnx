@@ -1,7 +1,7 @@
 <Solution>
   <Project Path="../JustChat.Application/JustChat.Application.csproj" />
   <Project Path="../JustChat.Contracts/JustChat.Contracts.csproj" />
-  <Project Path="../JustChat.DatabaseProject/JustChat.DatabaseProject.sqlproj">
+  <Project Path="../JustChat.DatabaseProject/JustChat.DatabaseProject.sqlproj" Id="9c5aa003-3772-4db7-af16-a91ef1306c7e">
     <Build />
     <Deploy />
   </Project>

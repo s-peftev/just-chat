@@ -1,0 +1,76 @@
+﻿using JustChat.API.Extensions;
+using JustChat.Application.AppResult.Errors;
+using JustChat.Application.Interfaces.Identity;
+using JustChat.Contracts.Requests.Identity;
+using JustChat.Infrastructure.Constants;
+using JustChat.Infrastructure.Interfaces.Services.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace JustChat.API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[AllowAnonymous]
+public class AuthController(
+    IAccountService accountService,
+    IRefreshTokenCookieWriter refreshTokenCookieWriter
+    ) : ControllerBase
+{
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] UserLoginRequest request, CancellationToken ct)
+    {
+        var result = await accountService.LoginAsync(request, ct);
+
+        return result.Match(
+            data =>
+            {
+                refreshTokenCookieWriter.Set(data.RefreshToken);
+
+                return Ok(data.AccessToken);
+            },
+            error => error.CreateErrorResponse());
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(CancellationToken ct)
+    {
+        var refreshTokenValue = Request.Cookies[CookieNames.RefreshToken];
+
+        if (string.IsNullOrEmpty(refreshTokenValue))
+            return UserErrors.TokenMissing.CreateErrorResponse();
+
+        var result = await accountService.LogoutAsync(refreshTokenValue, ct);
+
+        refreshTokenCookieWriter.Delete();
+
+        return result.Match(
+            () => Ok(),
+            error => error.CreateErrorResponse());
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(CancellationToken ct)
+    {
+        var refreshTokenValue = Request.Cookies[CookieNames.RefreshToken];
+
+        if (string.IsNullOrEmpty(refreshTokenValue))
+            return UserErrors.TokenMissing.CreateErrorResponse();
+
+        var result = await accountService.RefreshToken(refreshTokenValue, ct);
+
+        return result.Match(
+            data =>
+            {
+                refreshTokenCookieWriter.Set(data.RefreshToken);
+
+                return Ok(data.AccessToken);
+            },
+            error =>
+            {
+                refreshTokenCookieWriter.Delete();
+
+                return error.CreateErrorResponse();
+            });
+    }
+}

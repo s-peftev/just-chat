@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\JustChat.Application\JustChat.Application.csproj" />
     <ProjectReference Include="..\JustChat.Contracts\JustChat.Contracts.csproj" />
     <ProjectReference Include="..\JustChat.Infrastructure\JustChat.Infrastructure.csproj" />

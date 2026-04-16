@@ -1,4 +1,5 @@
 using JustChat.API.Configurators;
+using JustChat.API.Filters;
 using JustChat.API.Middleware;
 using JustChat.Infrastructure.Constants;
 using JustChat.Infrastructure.DI;
@@ -8,7 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ApiResponseEnvelopeFilter>();
+});
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.ConfigureCorsPolicy(builder.Configuration);
