@@ -1,4 +1,6 @@
-﻿using JustChat.Infrastructure.Constants;
+﻿using FluentValidation;
+using JustChat.Application.Validators;
+using JustChat.Infrastructure.Constants;
 using JustChat.Infrastructure.DI.Resolvers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +21,9 @@ public static class ResolveDI
         IdentityResolver.AddIdentityServices(services, configuration);
         UtilsResolver.AddUtils(services);
         ServicesResolver.AddServices(services);
+
+        ValidatorOptions.Global.LanguageManager.Enabled = false;
+        ValidatorsRegistration.RegisterValidators(services);
     }
 
     public static void ConfigureCorsPolicy(this IServiceCollection services, IConfiguration configuration)
