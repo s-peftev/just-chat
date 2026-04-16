@@ -14,10 +14,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder);
-
         builder.Ignore<IdentityUserClaim<string>>();
         builder.Ignore<IdentityUserToken<string>>();
+
+        base.OnModelCreating(builder);
 
         builder.Entity<UserProfile>(entity =>
         {

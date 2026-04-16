@@ -1,5 +1,8 @@
-﻿using JustChat.Infrastructure.Persistence;
+﻿using JustChat.Application.Interfaces.Persistence;
+using JustChat.Application.Interfaces.Persistence.Repositories;
+using JustChat.Infrastructure.Persistence;
 using JustChat.Infrastructure.Persistence.Interceptors;
+using JustChat.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,5 +22,8 @@ internal static class PersistenceResolver
                 .UseSqlServer(connectionString)
                 .AddInterceptors(interceptor);
         });
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
     }
 }

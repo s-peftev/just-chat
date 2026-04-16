@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "JustChat.Application": {
+      "commandName": "Project"
+    }
+  }
+}
