@@ -11,12 +11,12 @@ namespace JustChat.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[AllowAnonymous]
 public class AuthController(
     IAccountService accountService,
     IRefreshTokenCookieWriter refreshTokenCookieWriter
     ) : ControllerBase
 {
-    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserLoginRequest request, CancellationToken ct)
     {
@@ -32,7 +32,6 @@ public class AuthController(
             error => error.CreateErrorResponse());
     }
 
-    [AllowAnonymous]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout(CancellationToken ct)
     {
@@ -50,7 +49,6 @@ public class AuthController(
             error => error.CreateErrorResponse());
     }
 
-    [AllowAnonymous]
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh(CancellationToken ct)
     {
@@ -74,12 +72,5 @@ public class AuthController(
 
                 return error.CreateErrorResponse();
             });
-    }
-
-    [Authorize]
-    [HttpGet("test")]
-    public IActionResult Test()
-    {
-        return Ok("granted");
     }
 }
