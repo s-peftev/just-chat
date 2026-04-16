@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="../JustChat.Application/JustChat.Application.csproj" />
+  <Project Path="../JustChat.Contracts/JustChat.Contracts.csproj" />
+  <Project Path="../JustChat.DatabaseProject/JustChat.DatabaseProject.sqlproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="../JustChat.Domain/JustChat.Domain.csproj" />
+  <Project Path="../JustChat.Infrastructure/JustChat.Infrastructure.csproj" />
+  <Project Path="JustChat.API.csproj" />
+</Solution>
