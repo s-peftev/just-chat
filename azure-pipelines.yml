@@ -1,0 +1,112 @@
+trigger:
+- main
+
+pr:
+- main
+
+pool:
+  name: 'Default'
+
+stages:
+- stage: Build
+  displayName: 'Build Stage'
+  variables:
+  - group: shared-vars
+  jobs:
+  - job: BuildJob
+    displayName: 'Restore, Build and Publish'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        npm install
+        npm run build -- --configuration=production
+      displayName: 'npm install and build Angular'
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive Angular UI'
+      inputs:
+        rootFolderOrFile: 'dist/just-chat.web-ui/browser'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/Angular/AngularUI.zip'
+        replaceExistingArchive: true
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore Dependencies'
+      inputs:
+        command: 'restore'
+        projects: '$(SolutionPath)'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish API'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '**/JustChat.API.csproj'
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/API'
+        zipAfterPublish: true
+
+    - task: MSBuild@1
+      displayName: 'Build Database Project'
+      inputs:
+        solution: '**/JustChat.DatabaseProject.sqlproj'
+        msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)/Database'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Upload Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+- stage: DeployDev
+  displayName: 'Deploy to Azure'
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  variables:
+  - group: shared-vars
+  - group: prod-vars
+  - group: keyvault-secret-vars
+  jobs:
+  - deployment: DeployWeb
+    displayName: 'Deploy WebUI, API and DB'
+    environment: 'Prod'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: SqlAzureDacpacDeployment@1
+            displayName: 'Update Database Schema'
+            inputs:
+              azureSubscription: 'sc-ab-prod'
+              AuthenticationType: '$(DbAuthType)'
+              ServerName: '$(DbServerName)'
+              DatabaseName: '$(DbName)'
+              SqlUsername: '$(DbAdminLogin)'
+              SqlPassword: '$(DbAdminPassword)'
+              deployType: 'DacpacTask'
+              DeploymentAction: 'Publish'
+              DacpacFile: '$(Pipeline.Workspace)/$(artifactName)/Database/*.dacpac'
+              IpDetectionMethod: 'AutoDetect'
+
+          - task: AzureRmWebAppDeployment@4
+            displayName: 'Deploy App Service (API)'
+            inputs:
+              azureSubscription: 'sc-ab-prod'
+              WebAppName: '$(AppServiceApiName)'
+              package: '$(Pipeline.Workspace)/$(artifactName)/API/JustChat.API.zip'
+              appSettings: '-ASPNETCORE_ENVIRONMENT $(ASPNETCORE_ENVIRONMENT)'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy App Service (Angular)'
+            inputs:
+              azureSubscription: 'sc-ab-prod'
+              appType: 'webAppLinux'
+              appName: '$(AppServiceWebUIName)'
+              package: '$(Pipeline.Workspace)/$(artifactName)/Angular/AngularUI.zip'
+              runtimeStack: 'NODE|20-lts'
+              startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'

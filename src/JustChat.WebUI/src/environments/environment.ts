@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'api/',
+    apiUrl: 'https://app-jc-api.azurewebsites.net/api/',
 };

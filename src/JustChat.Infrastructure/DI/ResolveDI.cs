@@ -1,7 +1,9 @@
-﻿using FluentValidation;
+﻿using Azure.Identity;
+using FluentValidation;
 using JustChat.Application.Validators;
 using JustChat.Infrastructure.Constants;
 using JustChat.Infrastructure.DI.Resolvers;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -41,5 +43,15 @@ public static class ResolveDI
                       .AllowCredentials();
             });
         });
+    }
+
+    public static void ConfigureKeyVault(this WebApplicationBuilder builder)
+    {
+        var keyVaultUri = builder.Configuration["KeyVaultUri"]
+            ?? throw new InvalidOperationException("KeyVaultUri is not configured.");
+
+        var vaultUri = new Uri(keyVaultUri);
+
+        builder.Configuration.AddAzureKeyVault(vaultUri, new DefaultAzureCredential());
     }
 }
