@@ -22,25 +22,16 @@ stages:
       displayName: 'Install Node.js'
 
     - script: |
-        npm install
-        npm run build -- --configuration=production
+        call npm install
+        call npm run build -- --configuration=production
       displayName: 'npm install and build Angular'
       workingDirectory: 'src/JustChat.WebUI'
 
-    - script: |
-        echo "Searching for dist folder..."
-        dir /s /b | findstr /i "dist"
-      displayName: 'Find dist folder location'
-      workingDirectory: 'src/JustChat.WebUI'
-
-    - script: dir /s
-      displayName: 'List all files'
-      workingDirectory: 'src/JustChat.WebUI'
 
     - task: ArchiveFiles@2
       displayName: 'Archive Angular UI'
       inputs:
-        rootFolderOrFile: 'src/JustChat.WebUI/dist/just-chat.web-ui'
+        rootFolderOrFile: 'src/JustChat.WebUI/dist/just-chat.web-ui/browser'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/Angular/AngularUI.zip'
