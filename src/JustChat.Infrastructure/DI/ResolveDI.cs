@@ -28,7 +28,7 @@ public static class ResolveDI
 
     public static void ConfigureCorsPolicy(this IServiceCollection services, IConfiguration configuration)
     {
-        var allowedOrigins = configuration.GetSection("FrontEnd:Url").Value
+        var allowedOrigins = configuration.GetSection("Frontend:Url").Value
             ?? throw new InvalidOperationException("FrontEnd Url is not configured.");
 
         services.AddCors(options =>

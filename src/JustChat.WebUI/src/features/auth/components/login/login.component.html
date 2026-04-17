@@ -1,3 +1,54 @@
-<div class="pt-20">
-  <p>login works!</p>
+<div
+  class="fixed inset-0 w-full h-full font-sans text-neutral-100 flex items-center justify-center p-4 overflow-y-auto">
+
+  <div
+    class="relative z-10 w-full max-w-105 bg-[#1c1c1e]/95 border border-orange-900/30 rounded-4xl p-10 shadow-2xl shadow-black">
+
+    <div class="mb-8 text-center">
+      <h1 class="text-5xl font-serif text-[#e5e5e5] mb-1 tracking-tighter"
+        style="font-family: 'Copperplate', 'Times New Roman', serif; text-transform: uppercase;">
+        Log in
+      </h1>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="login()" autocomplete="off" class="flex flex-col gap-5">
+
+      <div class="flex flex-col gap-1.5">
+        <div class="h-13">
+          <app-text-input [formControl]="$any(loginForm.controls['email'])" [label]="'Enter your email'" />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <div class="h-13">
+          <app-text-input [formControl]="$any(loginForm.controls['password'])" [label]="'Enter your password'"
+            [type]="'password'" />
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid" class="w-full h-14 bg-lime-200 hover:bg-lime-300 text-[#1a1a1a] rounded-2xl text-lg font-bold 
+                       transition-all active:scale-[0.98] mt-4 shadow-lg shadow-lime-950/20">
+        Log In
+      </button>
+
+      <div class="relative flex items-center my-1">
+        <div class="grow border-t border-neutral-700/50"></div>
+        <span class="px-3 text-xs text-neutral-500 uppercase font-medium">or</span>
+        <div class="grow border-t border-neutral-700/50"></div>
+      </div>
+
+      <button type="button"
+        class="w-full h-12 bg-white text-neutral-900 rounded-xl text-sm font-bold flex items-center justify-center gap-3 hover:bg-neutral-100 transition-colors">
+        <img src="https://www.google.com/images/branding/product/2x/google_24dp.png" alt="G" class="h-5 w-5">
+        Continue with Google
+      </button>
+
+      <div class="flex flex-row justify-between items-center mt-4 px-1">
+        <a href="#" class="text-xs text-neutral-400 hover:text-white transition-colors">Forgot Password?</a>
+        <p class="text-xs text-neutral-400">
+          Don't have an account? <a href="#" class="text-[#e69b3e] font-bold hover:underline">Sign Up</a>
+        </p>
+      </div>
+    </form>
+  </div>
 </div>

@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AuthStore } from '../auth/store/auth.store';
 
 @Component({
   selector: 'app-profile',
@@ -7,5 +8,9 @@ import { Component } from '@angular/core';
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
+  public authStore = inject(AuthStore);
 
+  public logout() {
+    this.authStore.logout();
+  }
 }
