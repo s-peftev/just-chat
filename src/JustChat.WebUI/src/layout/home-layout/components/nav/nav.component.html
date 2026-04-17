@@ -1,0 +1,28 @@
+<header class="fixed inset-x-0 top-0 z-50 w-full bg-transparent shadow-none">    <nav class="navbar container mx-auto px-4">
+        <div class="flex-1">
+            <a [routerLink]="[ROUTES.HOME]"
+                class="text-xl tracking-tight font-bold cursor-pointer select-none text-white">
+                JustChat
+            </a>
+        </div>
+
+        <div class="flex-none">
+            <ul class="flex items-center gap-3 list-none m-0 p-0">
+                <li>
+                    <a [routerLink]="[ROUTES.AUTH.LOGIN]"
+                        class="btn btn-sm normal-case px-6 font-normal shadow-sm transition-all bg-white/10 backdrop-blur-md 
+                            text-white border-white/20 hover:bg-white/20 hover:border-white/40">
+                        Log In
+                    </a>
+                </li>
+                <li>
+                    <a [routerLink]="[ROUTES.AUTH.REGISTER]"
+                        class="btn btn-sm normal-case px-6 font-normal shadow-sm transition-all bg-white/10 backdrop-blur-md 
+                            text-white border-white/20 hover:bg-white/20 hover:border-white/40">
+                        Sign Up
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>

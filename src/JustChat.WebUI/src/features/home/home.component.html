@@ -1,0 +1,23 @@
+<section
+  class="flex min-h-svh w-full flex-col items-center justify-center gap-10 px-2 text-center sm:gap-12 sm:px-6"
+  aria-label="Welcome"
+>  <h1
+    class="text-5xl font-bold tracking-tight text-white sm:text-7xl md:text-8xl lg:text-9xl"
+  >
+    Let&rsquo;s talk!
+  </h1>
+
+  <a
+    [routerLink]="[ROUTES.AUTH.REGISTER]"
+    class="btn btn-lg normal-case px-8 font-normal shadow-sm transition-all bg-white/10 backdrop-blur-md text-white border-white/20 hover:bg-white/20 hover:border-white/40 sm:btn-wide"
+  >
+    Start talking
+  </a>
+
+  <a
+    [routerLink]="[ROUTES.AUTH.LOGIN]"
+    class="text-sm text-white/75 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white hover:decoration-white/60 sm:text-base"
+  >
+    I already have an account
+  </a>
+</section>

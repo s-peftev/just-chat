@@ -2,12 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>JustChatWebUI</title>
+  <title>Just Chat</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="favicon.svg">
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <div id="pre-bootstrap-loader" class="fixed inset-0 flex items-center justify-center bg-black/10 z-50">
+      <span class="loading loading-ring w-16 h-16 text-lime-500"></span>
+    </div>
+  </app-root>
 </body>
+
 </html>
