@@ -15,8 +15,9 @@ import { AuthService } from "../services/auth.service";
 import { withLocalError } from "../../../store-extentions/features/with-local-error/with-local-error.feature";
 import { clearError, setError } from "../../../store-extentions/features/with-local-error/with-local-error.updaters";
 import { ROUTES } from "../../../core/constants/routes.constants";
-import { ApiError, DefaultErrors, isApiError } from "../../../dto/api/api-error.dto";
-import { setAccessToken } from "./auth.updaters";
+import { ApiError, DefaultErrors, formatApiErrorMessage, isApiError } from "../../../dto/api/api-error.dto";
+import { ToastrService } from "ngx-toastr";
+import { setAccessToken, setPasswordResetRequested } from "./auth.updaters";
 import { AccessToken } from "../../../dto/auth/access-token.dto";
 
 export const AuthStore = signalStore(
@@ -56,7 +57,8 @@ export const AuthStore = signalStore(
     }),
     withMethods((store) => {
         const router = inject(Router);
-        
+        const toastr = inject(ToastrService);
+
         return {
             login: rxMethod<LoginRequest>(input$ => input$.pipe(
                 tap(_ => patchState(store, setBusy())),
@@ -73,12 +75,11 @@ export const AuthStore = signalStore(
                                 router.navigate([ROUTES.PROFILE]);
                             },
                             error: (err: any) => {
-                                if (isApiError(err.error.error)) {
-                                    const apiErr = err.error.error as ApiError;
-                                    patchState(store, setError(apiErr));
-                                } else {
-                                    patchState(store, setError(DefaultErrors.UnexpectedError))
-                                }
+                                const apiErr: ApiError = isApiError(err?.error?.error)
+                                    ? (err.error.error as ApiError)
+                                    : DefaultErrors.UnexpectedError;
+                                patchState(store, setError(apiErr));
+                                toastr.error(formatApiErrorMessage(apiErr));
                             },
                             finalize: () => {
                                 patchState(store, setIdle());
@@ -113,6 +114,9 @@ export const AuthStore = signalStore(
                     })
                 );
             },
+
+            setPasswordResetRequested: (isPasswordResetRequested: boolean) =>
+                patchState(store, setPasswordResetRequested(isPasswordResetRequested)),
         };
     }),
     withHooks(store => {

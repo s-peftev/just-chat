@@ -1,33 +1,35 @@
-<div
-  class="fixed inset-0 w-full h-full font-sans text-neutral-100 flex items-center justify-center p-4 overflow-y-auto">
+<div class="flex fixed inset-0 w-full h-full font-sans text-neutral-100 items-center justify-center p-4 overflow-y-auto">
 
-  <div
-    class="relative z-10 w-full max-w-105 bg-[#1c1c1e]/95 border border-orange-900/30 rounded-4xl p-10 shadow-2xl shadow-black">
+  @if(authStore.isBusy()) {
+    <div class="fixed inset-0 flex items-center justify-center bg-black/10 z-50">
+      <app-busy />
+    </div>
+  }
+
+  <div class="relative max-w-md w-full mx-auto z-10 bg-[#1c1c1e]/95 border border-lime-900/30 rounded-4xl p-10 shadow-2xl shadow-black">
 
     <div class="mb-8 text-center">
-      <h1 class="text-5xl font-serif text-[#e5e5e5] mb-1 tracking-tighter"
-        style="font-family: 'Copperplate', 'Times New Roman', serif; text-transform: uppercase;">
+      <h1 class="text-5xl font-serif mb-1"
+        style="font-family: 'Copperplate', 'Times New Roman', serif;">
         Log in
       </h1>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="login()" autocomplete="off" class="flex flex-col gap-5">
+    <form [formGroup]="loginForm" (ngSubmit)="login()" autocomplete="off" class="flex flex-col gap-7">
 
-      <div class="flex flex-col gap-1.5">
-        <div class="h-13">
-          <app-text-input [formControl]="$any(loginForm.controls['email'])" [label]="'Enter your email'" />
-        </div>
+      <div class="mb-8 h-13">
+        <app-text-input [formControl]="$any(loginForm.controls['email'])" [label]="'Enter your email'" />
       </div>
 
-      <div class="flex flex-col gap-1.5">
-        <div class="h-13">
-          <app-text-input [formControl]="$any(loginForm.controls['password'])" [label]="'Enter your password'"
-            [type]="'password'" />
-        </div>
+      <div class="mb-8 h-13">
+        <app-text-input [formControl]="$any(loginForm.controls['password'])" [label]="'Enter your password'"
+          [type]="'password'" />
       </div>
 
-      <button type="submit" [disabled]="loginForm.invalid" class="w-full h-14 bg-lime-200 hover:bg-lime-300 text-[#1a1a1a] rounded-2xl text-lg font-bold 
-                       transition-all active:scale-[0.98] mt-4 shadow-lg shadow-lime-950/20">
+      <button type="submit" [disabled]="loginForm.invalid" 
+        class="btn btn-outline w-full h-14 bg-lime-300 hover:bg-lime-200 text-[#1a1a1a] rounded-2xl text-lg font-bold 
+          transition-all active:scale-[0.98] mt-4 shadow-lg shadow-lime-950/20 
+          disabled:bg-white/50 disabled:text-neutral-400 disabled:border-gray-300">
         Log In
       </button>
 
@@ -38,17 +40,44 @@
       </div>
 
       <button type="button"
-        class="w-full h-12 bg-white text-neutral-900 rounded-xl text-sm font-bold flex items-center justify-center gap-3 hover:bg-neutral-100 transition-colors">
-        <img src="https://www.google.com/images/branding/product/2x/google_24dp.png" alt="G" class="h-5 w-5">
+        class="btn btn-outline border-gray-300 w-full normal-case font-bold bg-white text-gray-700 shadow-sm transition-all
+                  hover:bg-gray-100 hover:text-gray-900 hover:border-gray-600">
+        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5 mr-3" alt="Google" />
         Continue with Google
       </button>
 
-      <div class="flex flex-row justify-between items-center mt-4 px-1">
-        <a href="#" class="text-xs text-neutral-400 hover:text-white transition-colors">Forgot Password?</a>
+      <div class="flex justify-between items-center mt-4 px-1">
+        <a [routerLink]="'/' + ROUTES.FORGOT_PASSWORD" class="text-xs text-neutral-400 hover:text-white transition-colors">Forgot Password?</a>
         <p class="text-xs text-neutral-400">
-          Don't have an account? <a href="#" class="text-[#e69b3e] font-bold hover:underline">Sign Up</a>
+          Don't have an account? <a [routerLink]="'/' + ROUTES.REGISTER" class="text-lime-300 font-bold hover:underline">Sign Up</a>
         </p>
       </div>
     </form>
   </div>
+
+  <div class="mt-8 max-w-md w-full mx-auto space-y-3">
+        <div class="flex items-center gap-2 px-4 mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0116 0z" />
+            </svg>
+            <span class="text-xs font-bold text-white/60 uppercase tracking-widest">Demo Credentials</span>
+        </div>
+
+        @for (row of demoCredentialRows; track row.id) {
+        <div [id]="row.id" (click)="useDemoCreds(row.id)"
+            class="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex justify-between items-center 
+            transition-all hover:bg-white/15 cursor-pointer">
+            <div class="flex flex-col">
+                <span class="text-[10px] text-brand-accent font-bold uppercase tracking-tighter">Email</span>
+                <span class="text-sm text-white font-mono">{{ row.email }}</span>
+            </div>
+            <div class="h-8 w-px bg-white/10"></div>
+            <div class="flex flex-col items-end">
+                <span class="text-[10px] text-white/40 font-bold uppercase">Password</span>
+                <span class="text-sm text-white font-mono">{{ row.password }}</span>
+            </div>
+        </div>
+        }
+    </div>
+    
 </div>

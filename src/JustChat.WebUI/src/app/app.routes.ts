@@ -5,6 +5,7 @@ import { MainLayoutComponent } from '../layout/main-layout/main-layout.component
 import { HomeComponent } from '../features/home/home.component';
 import { LoginComponent } from '../features/auth/components/login/login.component';
 import { RegisterComponent } from '../features/auth/components/register/register.component';
+import { ForgotPasswordComponent } from '../features/auth/components/forgot-password/forgot-password.component';
 import { ChatComponent } from '../features/chat/chat.component';
 import { ProfileComponent } from '../features/profile/profile.component';
 import { GuestGuard } from '../core/guards/guest.guard';
@@ -19,6 +20,7 @@ export const routes: Routes = [
             { path: ROUTES.HOME, component: HomeComponent },
             { path: ROUTES.AUTH.LOGIN, component: LoginComponent },
             { path: ROUTES.AUTH.REGISTER, component: RegisterComponent },
+            { path: ROUTES.AUTH.FORGOT_PASSWORD, component: ForgotPasswordComponent },
         ]
     },
     {

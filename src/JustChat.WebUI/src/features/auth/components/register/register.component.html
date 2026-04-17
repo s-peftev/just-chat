@@ -1,3 +1,66 @@
-<div class="pt-20">
-  <p>register works!</p>
+<div class="flex fixed inset-0 w-full h-full font-sans text-neutral-100 items-center justify-center p-4 overflow-y-auto">
+
+  @if (authStore.isBusy()) {
+    <div class="fixed inset-0 flex items-center justify-center bg-black/10 z-50">
+      <app-busy />
+    </div>
+  }
+
+  <div class="relative max-w-md w-full mx-auto z-10 bg-[#1c1c1e]/95 border border-lime-900/30 rounded-4xl p-10 shadow-2xl shadow-black">
+
+    <div class="mb-8 text-center">
+      <h1 class="text-5xl font-serif mb-1"
+        style="font-family: 'Copperplate', 'Times New Roman', serif;">
+        Sign up
+      </h1>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="register()" autocomplete="off" class="flex flex-col gap-7">
+
+      <div class="mb-8 h-13">
+        <app-text-input [formControl]="$any(registerForm.controls['firstName'])" [label]="'First name (optional)'" />
+      </div>
+
+      <div class="mb-8 h-13">
+        <app-text-input [formControl]="$any(registerForm.controls['lastName'])" [label]="'Last name (optional)'" />
+      </div>
+
+      <div class="mb-8 h-13">
+        <app-text-input [formControl]="$any(registerForm.controls['email'])" [label]="'Enter your email'"
+          [type]="'email'" />
+      </div>
+
+      <div class="mb-8 h-13">
+        <app-text-input [formControl]="$any(registerForm.controls['password'])" [label]="'Enter your password'"
+          [type]="'password'" />
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid"
+        class="btn btn-outline w-full h-14 bg-lime-300 hover:bg-lime-200 text-[#1a1a1a] rounded-2xl text-lg font-bold
+          transition-all active:scale-[0.98] mt-4 shadow-lg shadow-lime-950/20
+          disabled:bg-white/50 disabled:text-neutral-400 disabled:border-gray-300">
+        Create account
+      </button>
+
+      <div class="relative flex items-center my-1">
+        <div class="grow border-t border-neutral-700/50"></div>
+        <span class="px-3 text-xs text-neutral-500 uppercase font-medium">or</span>
+        <div class="grow border-t border-neutral-700/50"></div>
+      </div>
+
+      <button type="button"
+        class="btn btn-outline border-gray-300 w-full normal-case font-bold bg-white text-gray-700 shadow-sm transition-all
+                  hover:bg-gray-100 hover:text-gray-900 hover:border-gray-600">
+        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5 mr-3" alt="Google" />
+        Continue with Google
+      </button>
+
+      <div class="flex justify-center items-center mt-4 px-1">
+        <p class="text-xs text-neutral-400 m-0">
+          Already have an account?
+          <a [routerLink]="'/' + ROUTES.LOGIN" class="text-lime-300 font-bold hover:underline">Log in</a>
+        </p>
+      </div>
+    </form>
+  </div>
 </div>
