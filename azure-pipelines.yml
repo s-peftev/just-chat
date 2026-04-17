@@ -82,7 +82,7 @@ stages:
           - task: SqlAzureDacpacDeployment@1
             displayName: 'Update Database Schema'
             inputs:
-              azureSubscription: 'sc-ab-prod'
+              azureSubscription: 'sc-jc-prod'
               AuthenticationType: '$(DbAuthType)'
               ServerName: '$(DbServerName)'
               DatabaseName: '$(DbName)'
@@ -96,7 +96,7 @@ stages:
           - task: AzureRmWebAppDeployment@4
             displayName: 'Deploy App Service (API)'
             inputs:
-              azureSubscription: 'sc-ab-prod'
+              azureSubscription: 'sc-jc-prod'
               WebAppName: '$(AppServiceApiName)'
               package: '$(Pipeline.Workspace)/$(artifactName)/API/JustChat.API.zip'
               appSettings: '-ASPNETCORE_ENVIRONMENT $(ASPNETCORE_ENVIRONMENT)'
@@ -104,7 +104,7 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy App Service (Angular)'
             inputs:
-              azureSubscription: 'sc-ab-prod'
+              azureSubscription: 'sc-jc-prod'
               appType: 'webAppLinux'
               appName: '$(AppServiceWebUIName)'
               package: '$(Pipeline.Workspace)/$(artifactName)/Angular/AngularUI.zip'
