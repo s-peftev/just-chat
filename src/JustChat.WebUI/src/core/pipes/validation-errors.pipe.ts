@@ -16,8 +16,10 @@ export class ValidationErrorsPipe implements PipeTransform {
 
     const messages: Record<string, any> = {
       required: () => 'This field is required',
-      minlength: (err: any) => `Minimum length is ${err.requiredLength} characters`,
-      maxlength: (err: any) => `Maximum length is ${err.maxLength} characters`,
+      minlength: (err: { requiredLength: number; actualLength: number }) => 
+        `Minimum length is ${err.requiredLength} characters`,
+      maxlength: (err: { requiredLength: number; actualLength: number }) =>
+        `Maximum length is ${err.requiredLength} characters`,
       email: () => 'Invalid email format',
     };
 

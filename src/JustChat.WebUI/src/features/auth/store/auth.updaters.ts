@@ -7,3 +7,7 @@ export function setAccessToken(accessToken: AccessToken): PartialStateUpdater<Au
         accessToken: accessToken.tokenValue
     });
 }
+
+export function setPasswordResetRequested(isPasswordResetRequested: boolean): PartialStateUpdater<AuthSlice> {
+    return _ => ({ isPasswordResetRequested });
+}

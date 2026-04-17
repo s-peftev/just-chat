@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "ngx-toastr/toastr";
 @plugin "daisyui";
 
 html, body {

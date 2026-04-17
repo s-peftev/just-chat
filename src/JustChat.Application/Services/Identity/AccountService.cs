@@ -26,7 +26,7 @@ public class AccountService(
         var authResult = await appUserService.AuthenticateAsync(request.Email, request.Password);
 
         if (!authResult.IsSuccess)
-            return Result<AuthResultDto>.Failure(authResult.Error);
+            return Result<AuthResultDto>.Failure(UserErrors.LoginFailed);
 
         return await AuthenticateUserAsync(authResult.Value, ct: ct);
     }

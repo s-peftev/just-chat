@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ROUTES } from '../../../../core/constants/routes.constants';
@@ -8,19 +8,21 @@ import { TextInputComponent } from '../../../../shared/components/text-input/tex
 import { AuthStore } from '../../store/auth.store';
 
 @Component({
-  selector: 'app-register',
+  selector: 'app-forgot-password',
   imports: [
     ReactiveFormsModule,
     TextInputComponent,
     RouterLink,
     BusyComponent,
   ],
-  templateUrl: './register.component.html'
+  templateUrl: './forgot-password.component.html'
 })
-export class RegisterComponent {
+export class ForgotPasswordComponent implements OnInit {
   private fb = inject(FormBuilder);
 
-  protected registerForm: FormGroup = new FormGroup({});
+  protected forgotForm: FormGroup = new FormGroup({});
+  /** Email shown in the confirmation step after a successful (stub) submit. */
+  protected submittedEmail = '';
 
   public authStore = inject(AuthStore);
   public ROUTES = ROUTES.AUTH;
@@ -29,10 +31,14 @@ export class RegisterComponent {
     this.initForm();
   }
 
+  ngOnInit(): void {
+    this.authStore.setPasswordResetRequested(false);
+    this.submittedEmail = '';
+    this.forgotForm.reset({ email: '' });
+  }
+
   private initForm(): void {
-    this.registerForm = this.fb.group({
-      firstName: ['', [Validators.maxLength(USER_AUTH.NAME_MAX_LENGTH)]],
-      lastName: ['', [Validators.maxLength(USER_AUTH.NAME_MAX_LENGTH)]],
+    this.forgotForm = this.fb.group({
       email: [
         '',
         [
@@ -41,18 +47,13 @@ export class RegisterComponent {
           Validators.maxLength(USER_AUTH.EMAIL_MAX_LENGTH),
         ],
       ],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(USER_AUTH.PASSWORD_MIN_LENGTH),
-          Validators.maxLength(USER_AUTH.PASSWORD_MAX_LENGTH),
-        ],
-      ],
     });
   }
 
-  public register(): void {
-    if (this.registerForm.invalid) return;
+  resetPasswordRequest(): void {
+    if (this.forgotForm.invalid) return;
+
+    this.submittedEmail = this.forgotForm.value.email as string;
+    this.authStore.setPasswordResetRequested(true);
   }
 }
