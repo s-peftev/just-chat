@@ -15,6 +15,7 @@ internal static class ServicesResolver
     internal static void AddServices(IServiceCollection services)
     {
         services.AddSingleton<ITokenService, TokenService>();
+        services.AddSingleton<IGoogleIdTokenReader, GoogleIdTokenReader>();
 
         services.AddScoped<IAppUserService, AppUserService>();
         services.AddScoped<IRefreshTokenCookieWriter, RefreshTokenCookieWriter>();

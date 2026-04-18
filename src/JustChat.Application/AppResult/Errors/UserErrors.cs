@@ -25,4 +25,12 @@ public static class UserErrors
     public static readonly Error TokenMissing = new(
         UserErrorIDs.TokenMissing,
         ErrorType.Unauthorized);
+
+    public static readonly Error GoogleIdTokenInvalid = new(
+        UserErrorIDs.GoogleIdTokenInvalid,
+        ErrorType.Unauthorized);
+
+    public static readonly Error GoogleEmailNotVerified = new(
+        UserErrorIDs.GoogleEmailNotVerified,
+        ErrorType.Forbidden);
 }
