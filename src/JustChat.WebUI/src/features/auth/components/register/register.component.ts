@@ -6,6 +6,7 @@ import { USER_AUTH } from '../../../../core/constants/validation.constants';
 import { BusyComponent } from '../../../../shared/components/busy/busy.component';
 import { TextInputComponent } from '../../../../shared/components/text-input/text-input.component';
 import { AuthStore } from '../../store/auth.store';
+import { RegisterRequest } from '../../../../dto/auth/register-request.dto';
 
 @Component({
   selector: 'app-register',
@@ -54,5 +55,9 @@ export class RegisterComponent {
 
   public register(): void {
     if (this.registerForm.invalid) return;
+
+    const request: RegisterRequest = this.registerForm.value;
+    
+    this.authStore.register(request);
   }
 }
