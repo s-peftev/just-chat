@@ -15,6 +15,8 @@ export const API_ERROR_MESSAGES: Readonly<Record<string, string>> = {
 
   // UserErrorIDs
   LoginFailed: 'Invalid email or password.',
+  EmailIsTaken: 'An account with this email already exists.',
+  RegistrationFailed: 'Registration could not be completed. Please check your details and try again.',
   RefreshTokenInvalid: 'Your session has expired. Please sign in again.',
   TokenMissing: 'Authentication token is missing.',
 

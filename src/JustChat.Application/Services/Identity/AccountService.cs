@@ -2,6 +2,7 @@
 using JustChat.Application.AppResult.Errors;
 using JustChat.Application.Interfaces.Entities;
 using JustChat.Application.Interfaces.Identity;
+using JustChat.Application.Interfaces.Persistence;
 using JustChat.Application.Interfaces.System;
 using JustChat.Application.Interfaces.Utils;
 using JustChat.Application.Options;
@@ -18,12 +19,14 @@ public class AccountService(
     IOptions<RefreshTokenOptions> refreshTokenOptions,
     IRequestInfoService requestInfoService,
     IDateTimeProvider dateTimeProvider,
-    IRefreshTokenService refreshTokenService
+    IRefreshTokenService refreshTokenService,
+    IUserProfileService userProfileService,
+    IUnitOfWork unitOfWork
     ) : IAccountService
 {
     public async Task<Result<AuthResultDto>> LoginAsync(UserLoginRequest request, CancellationToken ct = default)
     {
-        var authResult = await appUserService.AuthenticateAsync(request.Email, request.Password);
+        var authResult = await appUserService.AuthenticateAsync(request.Email, request.Password, ct);
 
         if (!authResult.IsSuccess)
             return Result<AuthResultDto>.Failure(UserErrors.LoginFailed);
@@ -80,6 +83,43 @@ public class AccountService(
         return Result<AuthResultDto>.Success(BuildAuthResult(jwtToken, refreshToken));
     }
 
+    public async Task<Result<AuthResultDto>> RegisterAsync(UserRegisterRequest request, CancellationToken ct = default)
+    {
+        var userCheck = await EnsureEmailIsUniqueAsync(request.Email, ct);
+
+        if (!userCheck.IsSuccess)
+            return Result<AuthResultDto>.Failure(userCheck.Error);
+
+        UserAuthDto? registeredUser = null;
+
+        await unitOfWork.BeginTransactionAsync(ct);
+        try
+        {
+            var registerResult = await appUserService.RegisterAppUserAsync(request.Email, request.Password, ct);
+
+            if (!registerResult.IsSuccess)
+            {
+                await unitOfWork.RollbackTransactionAsync(ct);
+
+                return Result<AuthResultDto>.Failure(registerResult.Error);
+            }
+
+            userProfileService.AddForNewUser(registerResult.Value.UserId, request.FirstName, request.LastName);
+
+            await unitOfWork.SaveChangesAsync(ct);
+            await unitOfWork.CommitTransactionAsync(ct);
+
+            registeredUser = registerResult.Value;
+        }
+        catch
+        {
+            await unitOfWork.RollbackTransactionAsync(ct);
+            throw;
+        }
+
+        return await AuthenticateUserAsync(registeredUser!, ct: ct);
+    }
+
     private async Task<Result<AuthResultDto>> AuthenticateUserAsync(UserAuthDto userAuthDto, Guid? sessionId = default, CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
@@ -113,4 +153,14 @@ public class AccountService(
     private bool IsTimeToRotateToken(RefreshToken refreshToken) =>
             (refreshToken.ExpiresAtUtc - dateTimeProvider.UtcNow)
                 < TimeSpan.FromDays(refreshTokenOptions.Value.RotationThresholdDays);
+
+    private async Task<Result> EnsureEmailIsUniqueAsync(string email, CancellationToken ct = default)
+    {
+        var userEmailResult = await appUserService.FindUserByEmailAsync(email, ct);
+
+        if (!string.IsNullOrEmpty(email) && userEmailResult.IsSuccess)
+            return Result.Failure(UserErrors.EmailIsTaken);
+
+        return Result.Success();
+    }
 }

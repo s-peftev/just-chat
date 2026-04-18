@@ -25,5 +25,6 @@ internal static class PersistenceResolver
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
     }
 }
