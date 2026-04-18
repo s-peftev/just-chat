@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ROUTES } from '../../../../core/constants/routes.constants';
 import { AuthStore } from '../../store/auth.store';
@@ -7,6 +7,8 @@ import { LoginRequest } from '../../../../dto/auth/login-request.dto';
 import { TextInputComponent } from '../../../../shared/components/text-input/text-input.component';
 import { RouterLink } from '@angular/router';
 import { BusyComponent } from "../../../../shared/components/busy/busy.component";
+import { environment } from '../../../../environments/environment';
+import { GoogleIdentityService } from '../../services/google-identity.service';
 
 @Component({
   selector: 'app-login',
@@ -18,8 +20,9 @@ import { BusyComponent } from "../../../../shared/components/busy/busy.component
 ],
   templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit, OnDestroy {
   private fb = inject(FormBuilder);
+  private readonly googleIdentity = inject(GoogleIdentityService);
 
   protected loginForm: FormGroup = new FormGroup({});
 
@@ -38,8 +41,38 @@ export class LoginComponent {
   public authStore = inject(AuthStore);
   public ROUTES = ROUTES.AUTH;
 
+  protected readonly googleSignInEnabled = !!environment.googleClientId?.trim();
+
+  @ViewChild('googleSignInHost', { read: ElementRef }) private googleSignInHost?: ElementRef<HTMLElement>;
+
   constructor() {
     this.initForm();
+  }
+
+  ngAfterViewInit(): void {
+    void this.mountGoogleSignIn();
+  }
+
+  ngOnDestroy(): void {
+    const el = this.googleSignInHost?.nativeElement;
+    if (el) {
+      this.googleIdentity.dispose(el);
+    }
+  }
+
+  private async mountGoogleSignIn(): Promise<void> {
+    if (!this.googleSignInEnabled) {
+      return;
+    }
+
+    const el = this.googleSignInHost?.nativeElement;
+    if (!el) {
+      return;
+    }
+
+    await this.googleIdentity.mountSignInButton(el, (idToken) => {
+      this.authStore.loginWithGoogle({ idToken });
+    });
   }
 
   private initForm(): void {

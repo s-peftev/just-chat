@@ -20,6 +20,7 @@ import { ToastrService } from "ngx-toastr";
 import { setAccessToken, setPasswordResetRequested } from "./auth.updaters";
 import { AccessToken } from "../../../dto/auth/access-token.dto";
 import { RegisterRequest } from "../../../dto/auth/register-request.dto";
+import { GoogleLoginRequest } from "../../../dto/auth/google-login-request.dto";
 
 export const AuthStore = signalStore(
     { providedIn: 'root' },
@@ -65,6 +66,35 @@ export const AuthStore = signalStore(
                 tap(_ => patchState(store, setBusy())),
                 exhaustMap(request =>
                     store._authService.login(request).pipe(
+                        tapResponse({
+                            next: response => {
+                                patchState(store, 
+                                    setAccessToken(response),
+                                    clearError());
+                                
+                                // store._profileStore.getMyProfile();
+
+                                router.navigate([ROUTES.PROFILE]);
+                            },
+                            error: (err: any) => {
+                                const apiErr: ApiError = isApiError(err?.error?.error)
+                                    ? (err.error.error as ApiError)
+                                    : DefaultErrors.UnexpectedError;
+                                patchState(store, setError(apiErr));
+                                toastr.error(formatApiErrorMessage(apiErr));
+                            },
+                            finalize: () => {
+                                patchState(store, setIdle());
+                            }
+                        })
+                    )
+                )
+            )),
+
+            loginWithGoogle: rxMethod<GoogleLoginRequest>(input$ => input$.pipe(
+                tap(_ => patchState(store, setBusy())),
+                exhaustMap(request =>
+                    store._authService.loginWithGoogle(request).pipe(
                         tapResponse({
                             next: response => {
                                 patchState(store, 
