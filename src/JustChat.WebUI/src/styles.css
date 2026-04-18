@@ -7,3 +7,10 @@ html, body {
   margin: 0;
   background-color: transparent;
 }
+
+/* Google Identity Services: center rendered control inside auth card host */
+.google-sign-in-host > div {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}

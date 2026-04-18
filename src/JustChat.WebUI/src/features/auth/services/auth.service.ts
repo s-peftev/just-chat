@@ -5,6 +5,7 @@ import { AccessToken } from '../../../dto/auth/access-token.dto';
 import { AuthApi } from '../../../core/constants/api/auth-api.constants';
 import { Observable } from 'rxjs';
 import { RegisterRequest } from '../../../dto/auth/register-request.dto';
+import { GoogleLoginRequest } from '../../../dto/auth/google-login-request.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +27,9 @@ export class AuthService {
 
   public register(registerRequest: RegisterRequest): Observable<AccessToken> {
     return this._apiClient.post<RegisterRequest, AccessToken>(AuthApi.REGISTER, registerRequest, { withCredentials: true });
+  }
+
+  public loginWithGoogle(googleLoginRequest: GoogleLoginRequest): Observable<AccessToken> {
+    return this._apiClient.post<GoogleLoginRequest, AccessToken>(AuthApi.LOGIN_GOOGLE, googleLoginRequest, { withCredentials: true });
   }
 }
