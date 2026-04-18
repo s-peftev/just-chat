@@ -22,5 +22,6 @@ internal static class ServicesResolver
 
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        services.AddScoped<IUserProfileService, UserProfileService>();
     }
 }

@@ -73,4 +73,20 @@ public class AuthController(
                 return error.CreateErrorResponse();
             });
     }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] UserRegisterRequest request, CancellationToken ct)
+    {
+        var result = await accountService.RegisterAsync(request, ct);
+
+        return result.Match(
+            data =>
+            {
+                refreshTokenCookieWriter.Set(data.RefreshToken);
+
+                return Ok(data.AccessToken);
+            },
+            error => error.CreateErrorResponse()
+        );
+    }
 }

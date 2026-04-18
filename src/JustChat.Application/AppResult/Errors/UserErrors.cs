@@ -9,6 +9,15 @@ public static class UserErrors
         UserErrorIDs.LoginFailed,
         ErrorType.Unauthorized);
 
+    public static readonly Error EmailIsTaken = new(
+        UserErrorIDs.EmailIsTaken,
+        ErrorType.Conflict);
+
+    public static Error RegistrationFailed(IEnumerable<string> details) => new(
+        UserErrorIDs.RegistrationFailed,
+        ErrorType.Validation,
+        details);
+
     public static readonly Error RefreshTokenInvalid = new(
         UserErrorIDs.RefreshTokenInvalid,
         ErrorType.Unauthorized);

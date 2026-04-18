@@ -29,6 +29,31 @@ public class AppUserService(
         return Result<UserAuthDto>.Success(new UserAuthDto(user.Id, user.Email!));
     }
 
+    public async Task<Result<UserAuthDto>> RegisterAppUserAsync(string Email, string Password, CancellationToken ct = default)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        var user = new AppUser
+        {
+            UserName = Email,
+            Email = Email,
+        };
+
+        var identityResult = await userManager.CreateAsync(user, Password);
+
+        if (!identityResult.Succeeded)
+        {
+            if (identityResult.Errors.Any(e => e.Code is "DuplicateEmail" or "DuplicateUserName"))
+                return Result<UserAuthDto>.Failure(UserErrors.EmailIsTaken);
+
+            var details = identityResult.Errors.Select(e => e.Description).ToList();
+
+            return Result<UserAuthDto>.Failure(UserErrors.RegistrationFailed(details));
+        }
+
+        return Result<UserAuthDto>.Success(new UserAuthDto(user.Id, user.Email!));
+    }
+
     public async Task<Result<UserAuthDto>> GetUserAuthInfoByIdAsync(string userId, CancellationToken ct = default)
     {
         var userInfo = await userManager.Users
@@ -39,5 +64,16 @@ public class AppUserService(
         return userInfo is null
             ? Result<UserAuthDto>.Failure(GeneralErrors.NotFound)
             : Result<UserAuthDto>.Success(userInfo);
+    }
+
+    public async Task<Result> FindUserByEmailAsync(string email, CancellationToken ct = default)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        var user = await userManager.FindByEmailAsync(email);
+
+        return user is null
+            ? Result.Failure(GeneralErrors.NotFound)
+            : Result.Success();
     }
 }

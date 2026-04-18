@@ -25,7 +25,6 @@ internal static class IdentityResolver
                     opt.Password.RequireNonAlphanumeric = false;
 
                     opt.User.RequireUniqueEmail = true;
-                    opt.SignIn.RequireConfirmedEmail = true;
                 })
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
