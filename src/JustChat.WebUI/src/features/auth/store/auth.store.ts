@@ -19,6 +19,7 @@ import { ApiError, DefaultErrors, formatApiErrorMessage, isApiError } from "../.
 import { ToastrService } from "ngx-toastr";
 import { setAccessToken, setPasswordResetRequested } from "./auth.updaters";
 import { AccessToken } from "../../../dto/auth/access-token.dto";
+import { RegisterRequest } from "../../../dto/auth/register-request.dto";
 
 export const AuthStore = signalStore(
     { providedIn: 'root' },
@@ -114,6 +115,35 @@ export const AuthStore = signalStore(
                     })
                 );
             },
+
+            register: rxMethod<RegisterRequest>(input$ => input$.pipe(
+                tap(_ => patchState(store, setBusy())),
+                exhaustMap(request =>
+                    store._authService.register(request).pipe(
+                        tapResponse({
+                            next: response => {
+                                // store._profileStore.getMyProfile();
+
+                                patchState(store,
+                                    setAccessToken(response),
+                                    clearError());
+
+                                router.navigate([ROUTES.PROFILE]);
+                            },
+                            error: (err: any) => {
+                                const apiErr: ApiError = isApiError(err?.error?.error)
+                                    ? (err.error.error as ApiError)
+                                    : DefaultErrors.UnexpectedError;
+                                patchState(store, setError(apiErr));
+                                toastr.error(formatApiErrorMessage(apiErr));
+                            },
+                            finalize: () => {
+                                patchState(store, setIdle());
+                            }
+                        })
+                    )
+                )
+            )),
 
             setPasswordResetRequested: (isPasswordResetRequested: boolean) =>
                 patchState(store, setPasswordResetRequested(isPasswordResetRequested)),

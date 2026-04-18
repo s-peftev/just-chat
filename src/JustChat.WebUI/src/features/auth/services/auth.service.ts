@@ -4,6 +4,7 @@ import { LoginRequest } from '../../../dto/auth/login-request.dto';
 import { AccessToken } from '../../../dto/auth/access-token.dto';
 import { AuthApi } from '../../../core/constants/api/auth-api.constants';
 import { Observable } from 'rxjs';
+import { RegisterRequest } from '../../../dto/auth/register-request.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -21,5 +22,9 @@ export class AuthService {
 
   public refresh(): Observable<AccessToken> {
     return this._apiClient.postNoIntercept<AccessToken>(AuthApi.REFRESH, undefined, { withCredentials: true });
+  }
+
+  public register(registerRequest: RegisterRequest): Observable<AccessToken> {
+    return this._apiClient.post<RegisterRequest, AccessToken>(AuthApi.REGISTER, registerRequest, { withCredentials: true });
   }
 }
