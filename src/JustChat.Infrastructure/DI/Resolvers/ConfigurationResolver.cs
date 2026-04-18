@@ -10,5 +10,6 @@ internal static class ConfigurationResolver
     {
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.JwtOptionsKey));
         services.Configure<RefreshTokenOptions>(configuration.GetSection(RefreshTokenOptions.RefreshTokenOptionsKey));
+        services.Configure<GoogleAuthOptions>(configuration.GetSection(GoogleAuthOptions.GoogleAuthOptionsKey));
     }
 }

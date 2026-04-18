@@ -9,4 +9,6 @@ public interface IAppUserService
     Task<Result<UserAuthDto>> RegisterAppUserAsync(string Email, string Password, CancellationToken ct = default);
     Task<Result<UserAuthDto>> GetUserAuthInfoByIdAsync(string userId, CancellationToken ct = default);
     Task<Result> FindUserByEmailAsync(string email, CancellationToken ct = default);
+
+    Task<Result<GoogleUserProvisionResultDto>> ProvisionGoogleUserAsync(GoogleIdTokenPayload payload, CancellationToken ct = default);
 }

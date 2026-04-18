@@ -16,6 +16,7 @@ namespace JustChat.Application.Services.Identity;
 public class AccountService(
     IAppUserService appUserService,
     ITokenService tokenService,
+    IGoogleIdTokenReader googleIdTokenReader,
     IOptions<RefreshTokenOptions> refreshTokenOptions,
     IRequestInfoService requestInfoService,
     IDateTimeProvider dateTimeProvider,
@@ -32,6 +33,63 @@ public class AccountService(
             return Result<AuthResultDto>.Failure(UserErrors.LoginFailed);
 
         return await AuthenticateUserAsync(authResult.Value, ct: ct);
+    }
+
+    public async Task<Result<AuthResultDto>> LoginWithGoogleAsync(GoogleLoginRequest request, CancellationToken ct = default)
+    {
+        var payloadResult = await googleIdTokenReader.ValidateAndReadAsync(request.IdToken, ct);
+
+        if (!payloadResult.IsSuccess)
+            return Result<AuthResultDto>.Failure(payloadResult.Error);
+
+        var payload = payloadResult.Value;
+
+        await unitOfWork.BeginTransactionAsync(ct);
+
+        UserAuthDto? userAuth;
+
+        try
+        {
+            var provisionResult = await appUserService.ProvisionGoogleUserAsync(payload, ct);
+
+            if (!provisionResult.IsSuccess)
+            {
+                await unitOfWork.RollbackTransactionAsync(ct);
+
+                return Result<AuthResultDto>.Failure(provisionResult.Error);
+            }
+
+            var provision = provisionResult.Value;
+
+            if (provision.RequiresUserProfile)
+            {
+                var (firstName, lastName) = SplitGoogleDisplayName(payload.Name);
+                userProfileService.AddForNewUser(provision.UserAuth.UserId, firstName, lastName);
+            }
+
+            await unitOfWork.SaveChangesAsync(ct);
+            await unitOfWork.CommitTransactionAsync(ct);
+
+            userAuth = provision.UserAuth;
+        }
+        catch
+        {
+            await unitOfWork.RollbackTransactionAsync(ct);
+            throw;
+        }
+
+        return await AuthenticateUserAsync(userAuth!, ct: ct);
+    }
+
+    private static (string? FirstName, string? LastName) SplitGoogleDisplayName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return (null, null);
+
+        var parts = name.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length == 1
+            ? (parts[0], null)
+            : (parts[0], parts[1]);
     }
 
     public async Task<Result> LogoutAsync(string refreshTokenValue, CancellationToken ct = default)
@@ -90,9 +148,10 @@ public class AccountService(
         if (!userCheck.IsSuccess)
             return Result<AuthResultDto>.Failure(userCheck.Error);
 
-        UserAuthDto? registeredUser = null;
-
         await unitOfWork.BeginTransactionAsync(ct);
+
+        UserAuthDto? registeredUser;
+
         try
         {
             var registerResult = await appUserService.RegisterAppUserAsync(request.Email, request.Password, ct);

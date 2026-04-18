@@ -32,6 +32,21 @@ public class AuthController(
             error => error.CreateErrorResponse());
     }
 
+    [HttpPost("login-google")]
+    public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleLoginRequest request, CancellationToken ct)
+    {
+        var result = await accountService.LoginWithGoogleAsync(request, ct);
+
+        return result.Match(
+            data =>
+            {
+                refreshTokenCookieWriter.Set(data.RefreshToken);
+
+                return Ok(data.AccessToken);
+            },
+            error => error.CreateErrorResponse());
+    }
+
     [HttpPost("logout")]
     public async Task<IActionResult> Logout(CancellationToken ct)
     {
