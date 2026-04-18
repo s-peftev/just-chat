@@ -4,6 +4,6 @@ public class RefreshTokenOptions
 {
     public const string RefreshTokenOptionsKey = "RefreshTokenOptions";
 
-    public int ExpirationTimeInDays { get; set; }
-    public int RotationThresholdDays { get; set; }
+    public required int ExpirationTimeInDays { get; set; }
+    public required int RotationThresholdDays { get; set; }
 }

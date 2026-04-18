@@ -56,7 +56,7 @@ export class GoogleIdentityService {
         theme: 'outline',
         size: 'large',
         text: 'continue_with',
-        shape: 'pill',
+        shape: 'rectangular',
         width,
         logo_alignment: 'left',
         locale: 'en',

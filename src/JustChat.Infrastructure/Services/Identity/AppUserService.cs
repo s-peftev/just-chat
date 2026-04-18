@@ -3,6 +3,7 @@ using JustChat.Application.AppResult.Errors;
 using JustChat.Application.Constants.Identity;
 using JustChat.Application.Interfaces.Identity;
 using JustChat.Contracts.DTOs.Identity;
+using JustChat.Contracts.DTOs.UserProfile;
 using JustChat.Infrastructure.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,23 @@ public class AppUserService(
         return userInfo is null
             ? Result<UserAuthDto>.Failure(GeneralErrors.NotFound)
             : Result<UserAuthDto>.Success(userInfo);
+    }
+
+    public async Task<Result<UserProfileDetailsDto>> GetUserProfileDetailsAsync(string userId, CancellationToken ct = default)
+    {
+        var userInfo = await userManager.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new UserProfileDetailsDto(
+                    u.Id,
+                    u.Email!,
+                    u.UserProfile.FirstName,
+                    u.UserProfile.LastName,
+                    u.UserProfile.ProfilePhotoUrl))
+                .FirstOrDefaultAsync(ct);
+
+        return userInfo is null
+            ? Result<UserProfileDetailsDto>.Failure(GeneralErrors.NotFound)
+            : Result<UserProfileDetailsDto>.Success(userInfo);
     }
 
     public async Task<Result> FindUserByEmailAsync(string email, CancellationToken ct = default)

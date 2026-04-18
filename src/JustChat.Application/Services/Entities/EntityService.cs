@@ -18,6 +18,11 @@ public abstract class EntityService<TEntity, TKey>(IRepository<TEntity, TKey> re
         return repository.Update(entity);
     }
 
+    public virtual async Task<TEntity?> GetByIdAsync(TKey id, CancellationToken ct = default)
+    { 
+        return await repository.GetByIdAsync(id, ct);
+    }
+
     public virtual async Task<Result> RemoveAsync(TKey id, CancellationToken ct = default)
     {
         if (!await repository.RemoveAsync(id, ct))

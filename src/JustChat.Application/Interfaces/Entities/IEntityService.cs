@@ -7,6 +7,7 @@ public interface IEntityService<TEntity, TKey>
 {
     TEntity Add(TEntity entity);
     TEntity Update(TEntity entity);
+    Task<TEntity?> GetByIdAsync(TKey id, CancellationToken ct = default);
     Task<Result> RemoveAsync(TKey id, CancellationToken ct = default);
     Task<Result<int>> SaveChangesAsync(CancellationToken ct = default);
 }
