@@ -1,4 +1,5 @@
 ﻿using Azure.Identity;
+using Azure.Storage.Blobs;
 using FluentValidation;
 using JustChat.Application.Validators;
 using JustChat.Infrastructure.Constants;
@@ -53,5 +54,13 @@ public static class ResolveDI
         var vaultUri = new Uri(keyVaultUri);
 
         builder.Configuration.AddAzureKeyVault(vaultUri, new DefaultAzureCredential());
+    }
+
+    public static void ConfigureBlobStorage(this WebApplicationBuilder builder)
+    {
+        var blobStorageConnectionString = builder.Configuration.GetConnectionString("BlobStorage")
+            ?? throw new InvalidOperationException("Blob Storage connection string is not configured.");
+        
+        builder.Services.AddSingleton(new BlobServiceClient(blobStorageConnectionString));
     }
 }

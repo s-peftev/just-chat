@@ -1,6 +1,6 @@
 /**
  * User-facing English messages for API {@link ApiError} `id` values.
- * Keep in sync with backend: `JustChat.Application.Constants.ErrorIDs` and `DefaultErrors` in `api-error.dto.ts`.
+ * Keep in sync with backend: `JustChat.Application.Constants.ErrorIDs` (e.g. `UserProfileErrorIDs`) and `DefaultErrors` in `api-error.dto.ts`.
  */
 export const API_ERROR_MESSAGES: Readonly<Record<string, string>> = {
   // GeneralErrorIDs
@@ -21,6 +21,13 @@ export const API_ERROR_MESSAGES: Readonly<Record<string, string>> = {
   TokenMissing: 'Authentication token is missing.',
   GoogleIdTokenInvalid: 'Google sign-in is unavailable or could not be completed. Please try again.',
   GoogleEmailNotVerified: 'Please verify your email with Google before signing in.',
+
+  // UserProfileErrorIDs
+  UserProfileNotFound: 'Your profile could not be found.',
+  InvalidProfilePhoto: 'The image could not be read. Please use a valid JPEG, PNG, or WebP file.',
+  ProfilePhotoProcessingFailed: 'The photo could not be processed. Please try a different image.',
+  ProfilePhotoUploadFailed: 'The photo could not be saved. Please try again in a moment.',
+  ProfilePhotoDeleteFailed: 'The photo could not be removed. Please try again in a moment.',
 
   // ExceptionErrorIDs
   RequestCancelled: 'The request was cancelled.',

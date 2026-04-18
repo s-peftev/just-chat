@@ -8,6 +8,7 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.ConfigureKeyVault();
+builder.ConfigureBlobStorage();
 
 if (builder.Environment.IsDevelopment())
 {

@@ -64,7 +64,20 @@ public class AccountService(
             if (provision.RequiresUserProfile)
             {
                 var (firstName, lastName) = SplitGoogleDisplayName(payload.Name);
-                userProfileService.AddForNewUser(provision.UserAuth.UserId, firstName, lastName);
+                var profile = userProfileService.AddForNewUser(provision.UserAuth.UserId, firstName, lastName);
+
+                if (!string.IsNullOrWhiteSpace(payload.PictureUri)
+                    && string.IsNullOrWhiteSpace(profile.ProfilePhotoUrl))
+                {
+                    profile.ProfilePhotoUrl = payload.PictureUri;
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(payload.PictureUri))
+            {
+                var profile = await userProfileService.GetByIdAsync(provision.UserAuth.UserId, ct);
+
+                if (profile is not null && string.IsNullOrWhiteSpace(profile.ProfilePhotoUrl))
+                    profile.ProfilePhotoUrl = payload.PictureUri;
             }
 
             await unitOfWork.SaveChangesAsync(ct);
