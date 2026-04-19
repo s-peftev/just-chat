@@ -10,4 +10,6 @@ public class UserProfile : IHasTimestamps
     public string? ProfilePhotoUrl { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
+
+    public ICollection<Message> Messages { get; set; } = [];
 }

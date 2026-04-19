@@ -4,13 +4,15 @@ using JustChat.Application.AppResult.Errors;
 using JustChat.Application.Interfaces.ExternalProviders;
 using JustChat.Application.Options;
 using JustChat.Contracts.DTOs.UserProfile;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace JustChat.Infrastructure.Services.ExternalProviders;
 
 public class PhotoService(
     BlobServiceClient blobServiceClient,
-    IOptions<BlobStorageContainersOptions> blobOptions
+    IOptions<BlobStorageContainersOptions> blobOptions,
+    ILogger<PhotoService> logger
     ) : IPhotoService
 {
     private readonly BlobContainerClient _containerClient = blobServiceClient.GetBlobContainerClient(blobOptions.Value.ProfilePhotos);
@@ -23,8 +25,10 @@ public class PhotoService(
         {
             await blobClient.UploadAsync(fileStream, overwrite: true, cancellationToken: ct);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            logger.LogError(ex, "Failed to upload photo");
+
             return Result<ProfilePhotoDto>.Failure(UserProfileErrors.ProfilePhotoUploadFailed);
         }
 
@@ -39,8 +43,10 @@ public class PhotoService(
         {
             await blobClient.DeleteIfExistsAsync(cancellationToken: ct);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            logger.LogError(ex, "Failed to delete photo");
+
             return Result.Failure(UserProfileErrors.ProfilePhotoDeleteFailed);
         }
 

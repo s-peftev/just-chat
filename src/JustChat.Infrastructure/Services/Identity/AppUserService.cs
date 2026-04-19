@@ -71,6 +71,24 @@ public class AppUserService(
             : Result<UserProfileDetailsDto>.Success(userInfo);
     }
 
+    public async Task<Result<List<UserProfileDetailsDto>>> GetUserProfileDetailsListAsync(IEnumerable<string> userIdList, CancellationToken ct = default)
+    {
+        if (!userIdList.Any())
+            return Result<List<UserProfileDetailsDto>>.Success([]);
+
+        var userInfoList = await userManager.Users
+                .Where(u => userIdList.Contains(u.Id))
+                .Select(u => new UserProfileDetailsDto(
+                    u.Id,
+                    u.Email!,
+                    u.UserProfile.FirstName,
+                    u.UserProfile.LastName,
+                    u.UserProfile.ProfilePhotoUrl))
+                .ToListAsync(ct);
+
+        return Result<List<UserProfileDetailsDto>>.Success(userInfoList);
+    }
+
     public async Task<Result> FindUserByEmailAsync(string email, CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();

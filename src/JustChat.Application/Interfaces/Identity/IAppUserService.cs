@@ -10,6 +10,7 @@ public interface IAppUserService
     Task<Result<UserAuthDto>> RegisterAppUserAsync(string Email, string Password, CancellationToken ct = default);
     Task<Result<UserAuthDto>> GetUserAuthInfoByIdAsync(string userId, CancellationToken ct = default);
     Task<Result<UserProfileDetailsDto>> GetUserProfileDetailsAsync(string userId, CancellationToken ct = default);
+    Task<Result<List<UserProfileDetailsDto>>> GetUserProfileDetailsListAsync(IEnumerable<string> userIdList, CancellationToken ct = default);
     Task<Result> FindUserByEmailAsync(string email, CancellationToken ct = default);
     Task<Result<GoogleUserProvisionResultDto>> ProvisionGoogleUserAsync(GoogleIdTokenPayload payload, CancellationToken ct = default);
 }

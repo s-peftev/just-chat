@@ -13,5 +13,6 @@ internal static class ConfigurationResolver
         services.Configure<GoogleAuthOptions>(configuration.GetSection(GoogleAuthOptions.GoogleAuthOptionsKey));
         services.Configure<BlobStorageContainersOptions>(configuration.GetSection(BlobStorageContainersOptions.BlobStorageContainersOptionsKey));
         services.Configure<ProfilePhotoProcessingOptions>(configuration.GetSection(ProfilePhotoProcessingOptions.SectionKey));
+        services.Configure<PaginationOptions>(configuration.GetSection(PaginationOptions.PaginationOptionsKey));
     }
 }

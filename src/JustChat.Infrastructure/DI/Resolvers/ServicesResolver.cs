@@ -6,6 +6,7 @@ using JustChat.Application.Interfaces.System;
 using JustChat.Application.Services.Entities;
 using JustChat.Application.Services.Identity;
 using JustChat.Infrastructure.Interfaces.Services.Identity;
+using JustChat.Infrastructure.Interfaces.Services.System;
 using JustChat.Infrastructure.Services.ExternalProviders;
 using JustChat.Infrastructure.Services.Identity;
 using JustChat.Infrastructure.Services.Images;
@@ -20,6 +21,8 @@ internal static class ServicesResolver
     {
         services.AddSingleton<ITokenService, TokenService>();
         services.AddSingleton<IGoogleIdTokenReader, GoogleIdTokenReader>();
+        services.AddSingleton<IChatOnlineTracker, ChatOnlineTracker>();
+        services.AddSingleton<ISentimentService, AzureSentimentService>();
 
         services.AddScoped<IAppUserService, AppUserService>();
         services.AddScoped<IRefreshTokenCookieWriter, RefreshTokenCookieWriter>();
@@ -30,5 +33,6 @@ internal static class ServicesResolver
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
+        services.AddScoped<IMessageService, MessageService>();
     }
 }

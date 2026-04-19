@@ -1,5 +1,6 @@
 using JustChat.API.Configurators;
 using JustChat.API.Filters;
+using JustChat.API.Hubs;
 using JustChat.API.Middleware;
 using JustChat.Infrastructure.Constants;
 using JustChat.Infrastructure.DI;
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.ConfigureKeyVault();
 builder.ConfigureBlobStorage();
+builder.ConfigureTextAnalytics();
 
 if (builder.Environment.IsDevelopment())
 {
@@ -18,11 +20,13 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<FluentValidationActionFilter>();
+    options.Filters.Add<PaginationNormalizationFilter>();
     options.Filters.Add<ApiResponseEnvelopeFilter>();
 });
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.ConfigureCorsPolicy(builder.Configuration);
+builder.Services.AddAzureSignalR(builder.Configuration);
 
 SerilogConfigurator.Configure();
 builder.Host.UseSerilog();
@@ -43,5 +47,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("hubs/chat");
 
 app.Run();
