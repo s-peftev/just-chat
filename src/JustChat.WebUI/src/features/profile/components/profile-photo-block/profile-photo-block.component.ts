@@ -7,13 +7,14 @@ import {
   fileSizeValidator,
   fileTypeValidator,
 } from '../../../../shared/validators/file.validators';
+import { ProfilePhotoCropModalComponent } from '../profile-photo-crop-modal/profile-photo-crop-modal.component';
 import { ProfileStore } from '../../store/profile.store';
 
 const maxAvatarBytes = USER_PROFILE.MAX_AVATAR_SIZE_MB * 1024 * 1024;
 
 @Component({
   selector: 'app-profile-photo-block',
-  imports: [],
+  imports: [ProfilePhotoCropModalComponent],
   templateUrl: './profile-photo-block.component.html',
   host: {
     class: 'block w-full min-w-[200px] max-w-[250px]',
@@ -50,6 +51,10 @@ export class ProfilePhotoBlockComponent {
   /** Custom confirm dialog instead of `window.confirm` for deleting the avatar. */
   protected readonly deletePhotoModalOpen = signal(false);
 
+  /** Object URL for image shown in Cropper before upload. */
+  protected readonly cropImageUrl = signal<string | null>(null);
+  protected readonly cropModalOpen = signal(false);
+
   protected onPhotoFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -60,13 +65,30 @@ export class ProfilePhotoBlockComponent {
 
     this.fileControl.setValue(file);
 
-    if (this.fileControl.valid) {
-      this.profileStore.uploadProfilePhoto(file);
-    } else {
+    if (!this.fileControl.valid) {
       this.showFileValidationErrors();
+      this.fileControl.setValue(null, { emitEvent: false });
+      return;
     }
 
+    const objectUrl = URL.createObjectURL(file);
+    this.cropImageUrl.set(objectUrl);
+    this.cropModalOpen.set(true);
     this.fileControl.setValue(null, { emitEvent: false });
+  }
+
+  protected closeCropModal(): void {
+    const url = this.cropImageUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+    this.cropImageUrl.set(null);
+    this.cropModalOpen.set(false);
+  }
+
+  protected onProfilePhotoCropped(file: File): void {
+    this.profileStore.uploadProfilePhoto(file);
+    this.closeCropModal();
   }
 
   private showFileValidationErrors(): void {

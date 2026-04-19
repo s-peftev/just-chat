@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "cropperjs/dist/cropper.css";
 @import "ngx-toastr/toastr";
 @plugin "daisyui";
 
@@ -8,7 +9,7 @@ html, body {
   background-color: transparent;
 }
 
-/* Google Identity Services: center rendered control inside auth card host */
+/* Google Identity Services: normalize GIS-rendered DOM inside auth card host */
 .google-sign-in-host {
   background: transparent;
 }
@@ -17,7 +18,19 @@ html, body {
   width: 100%;
   display: flex;
   justify-content: center;
-  background: transparent;
+  margin: 0 !important;
+}
+
+.google-sign-in-host {
+  overflow: hidden;
+}
+
+/* Remove baseline gap and stretch iframe to fill the host */
+.google-sign-in-host iframe {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .layout-wrapper {
