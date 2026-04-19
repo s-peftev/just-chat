@@ -4,10 +4,12 @@ using JustChat.Application.Interfaces.Identity;
 using JustChat.Contracts.Requests.Chat;
 using JustChat.Infrastructure.Constants.HubEvents;
 using JustChat.Infrastructure.Interfaces.Services.System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace JustChat.API.Hubs;
 
+[Authorize]
 public class ChatHub(
     IMessageService messageService,
     IAppUserService appUserService,

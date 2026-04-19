@@ -1,1 +1,120 @@
-<p>chat works!</p>
+<div class="relative flex flex-col h-full rounded w-full px-2">
+  <!-- HEADER -->
+  <div class="flex items-center justify-between h-20 px-6 bg-orange-200 text-gray-950 rounded-t shrink-0">
+    <h3 class="text-lg font-semibold">Chat</h3>
+  </div>
+
+  <!-- BODY -->
+  <div class="flex flex-1 min-h-0 border border-gray-300">
+
+    <!-- USERS -->
+    <div class="w-1/5 bg-orange-50 border-r border-gray-300 overflow-y-auto min-h-0">
+      <div
+        *ngFor="let user of chatStore.usersInChat()"
+        class="flex items-center gap-3 px-4 py-3 border-b hover:bg-gray-100 cursor-pointer"
+      >
+        <img
+          [src]="user.profilePhotoUrl"
+          class="w-10 h-10 rounded-full object-cover"
+        />
+
+        <span class="text-sm font-medium text-gray-700">
+          {{ user.email }}
+        </span>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="w-4/5 flex flex-col min-h-0 relative">
+
+      <!-- MESSAGES -->
+      <div #scrollContainer (scroll)="onScroll()"
+        class="flex-1 min-h-0 overflow-y-auto flex flex-col p-4"
+      >
+        <ng-container *ngFor="let message of chatStore.chatMessages().items; let i = index">
+
+          <div
+            #messageItem
+            class="flex mb-3"
+            [ngClass]="{
+              'justify-end': message.sender.email === profileStore.email(),
+              'justify-start': message.sender.email !== profileStore.email()
+            }"
+          >
+            <div
+              class="max-w-[75%] rounded-xl px-4 py-2 wrap-break-word"
+              [ngClass]="{
+                'bg-orange-200 text-gray-800':
+                  message.sender.email === profileStore.email(),
+                'bg-orange-100 text-gray-800':
+                  message.sender.email !== profileStore.email()
+              }"
+            >
+
+              <!-- avatar -->
+              <div
+                *ngIf="
+                  message.sender.email !== profileStore.email()
+                "
+                class="flex items-start gap-2 mb-1"
+              >
+                <img
+                  [src]="message.sender.profilePhotoUrl"
+                  class="w-7 h-7 rounded-full"
+                />
+                <span class="text-sm font-semibold text-gray-700 mt-1">
+                  {{ message.sender.email }}
+                </span>
+              </div>
+
+              <p class="text-sm leading-snug">
+                {{ message.text }}
+              </p>
+
+              <span class="block text-[10px] mt-1 opacity-80">
+                {{ message.createdAt | date: 'medium' }}
+                |
+                {{ messageSentiments[message.sentiment] }}
+              </span>
+            </div>
+          </div>
+
+        </ng-container>
+        <div #scroll ></div>
+      </div>
+
+      <button
+        *ngIf="showScrollToBottom"
+        type="button"
+        (click)="scrollToLatest()"
+        class="absolute bottom-20 right-4 w-10 h-10 rounded-full bg-orange-200 hover:bg-orange-400
+               flex items-center justify-center shadow transition"
+        aria-label="Scroll to latest message"
+      >
+        <span class="text-lg">↓</span>
+      </button>
+
+      <!-- INPUT -->
+      <div class="border-t border-gray-300 p-3 shrink-0 relative">
+        <input
+          [(ngModel)]="inputedMessage"
+          (keydown.enter)="sendMessage()"
+          type="text"
+          placeholder="Type a message"
+          class="w-full h-12 pr-14 px-4 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+        />
+
+        <button
+          (click)="sendMessage()"
+          type="button"
+          class="absolute right-4 top-1/2 -translate-y-1/2
+                 w-9 h-9 rounded-full bg-orange-200 hover:bg-orange-400
+                 flex items-center justify-center transition"
+        >
+        SEND
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
