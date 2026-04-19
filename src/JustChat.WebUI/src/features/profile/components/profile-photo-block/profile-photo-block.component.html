@@ -1,47 +1,55 @@
-<div class="group relative w-full max-w-[280px]">
+<div class="group relative aspect-square w-full @container-[size]">
   <input
     #photoInput
     type="file"
     class="sr-only"
-    accept="image/jpeg,image/png,image/webp"
+    [attr.accept]="avatarAccept"
     (change)="onPhotoFileSelected($event)"
   />
 
   <div
-    class="relative aspect-square w-full overflow-hidden rounded-3xl border border-white/10 bg-neutral-800/80 shadow-inner"
+    class="relative box-border h-full w-full overflow-hidden rounded-full border border-white/10 bg-white/10 shadow-inner backdrop-blur-md"
   >
     @if (profilePhotoUrl(); as url) {
       <img [src]="url" alt="Profile photo" class="h-full w-full object-cover" />
     } @else {
       <div
-        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-700/90 to-neutral-900/90 text-5xl font-semibold tracking-tight text-white/90 sm:text-6xl"
+        class="flex h-full w-full items-center justify-center bg-linear-to-br from-white/10 to-white/5 font-semibold 
+          tracking-tight text-white/90 text-[clamp(0.5rem,11cqw,2.25rem)]"
       >
         {{ initials() }}
       </div>
     }
 
     <div
-      class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/55 p-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+      class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/45 p-4 opacity-0 backdrop-blur-[2px] 
+        transition-opacity duration-200 group-hover:opacity-100"
     >
       @if (profileStore.hasProfilePhoto()) {
         <button
           type="button"
-          class="w-full max-w-[200px] rounded-2xl border border-white/20 bg-[#1c1c1e]/90 px-4 py-2.5 text-sm font-semibold text-neutral-100 shadow-lg transition hover:border-lime-500/40 hover:bg-[#252528]/95 hover:text-lime-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-400/60"
+          class="w-full max-w-50 rounded-2xl border border-white/20 bg-white/15 px-4 py-2.5 text-sm font-semibold 
+            text-neutral-100 shadow-lg backdrop-blur-md transition hover:border-lime-400/40 hover:bg-white/25 
+            hover:text-lime-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-400/60"
           (click)="triggerPhotoInput(photoInput)"
         >
           Change photo
         </button>
         <button
           type="button"
-          class="w-full max-w-[200px] rounded-2xl border border-red-400/25 bg-[#1c1c1e]/90 px-4 py-2.5 text-sm font-semibold text-red-200/90 shadow-lg transition hover:border-red-400/50 hover:bg-red-950/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400/50"
-          (click)="confirmDeletePhoto()"
+          class="w-full max-w-50 rounded-2xl border border-red-400/30 bg-red-950/35 px-4 py-2.5 text-sm font-semibold 
+            text-red-100 shadow-lg backdrop-blur-md transition hover:border-red-400/50 hover:bg-red-950/55 
+            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400/50"
+          (click)="openDeletePhotoModal()"
         >
           Delete photo
         </button>
       } @else {
         <button
           type="button"
-          class="w-full max-w-[200px] rounded-2xl border border-white/20 bg-[#1c1c1e]/90 px-4 py-2.5 text-sm font-semibold text-neutral-100 shadow-lg transition hover:border-lime-500/40 hover:bg-[#252528]/95 hover:text-lime-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-400/60"
+          class="w-full max-w-50 rounded-2xl border border-white/20 bg-white/15 px-4 py-2.5 text-sm font-semibold 
+          text-neutral-100 shadow-lg backdrop-blur-md transition hover:border-lime-400/40 hover:bg-white/25 
+          hover:text-lime-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-400/60"
           (click)="triggerPhotoInput(photoInput)"
         >
           Upload photo
@@ -50,3 +58,55 @@
     </div>
   </div>
 </div>
+
+@if (deletePhotoModalOpen()) {
+  <div
+    class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-photo-modal-title"
+  >
+    <button
+      type="button"
+      class="absolute inset-0 cursor-default bg-black/70 backdrop-blur-md rounded-4xl"
+      (click)="closeDeletePhotoModal()"
+      aria-label="Dismiss"
+    ></button>
+
+    <div
+      class="relative z-10 w-full max-w-md overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 shadow-2xl 
+        shadow-black/50 backdrop-blur-xl [isolation:isolate]"
+    >
+      <h2
+        id="delete-photo-modal-title"
+        class="text-center font-serif text-xl font-semibold tracking-tight text-neutral-50 sm:text-2xl"
+        style="font-family: 'Copperplate', 'Times New Roman', serif"
+      >
+        Remove photo?
+      </h2>
+      <p class="mt-3 text-center text-sm leading-relaxed text-neutral-300">
+        Your profile picture will be removed. You can upload a new one anytime.
+      </p>
+
+      <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          class="btn btn-outline w-full rounded-2xl border-white/20 bg-white/5 px-5 py-3 text-sm font-semibold text-neutral-200
+            shadow-lg backdrop-blur-md transition hover:border-white/35 hover:bg-white/10 hover:text-white
+            sm:w-auto"
+          (click)="closeDeletePhotoModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn w-full rounded-2xl border border-red-400/35 bg-red-950/45 px-5 py-3 text-sm font-semibold text-red-100
+            shadow-lg backdrop-blur-md transition hover:border-red-400/55 hover:bg-red-950/65 sm:w-auto"
+          (click)="confirmDeletePhoto()"
+        >
+          Remove
+        </button>
+      </div>
+    </div>
+  </div>
+}
