@@ -5,8 +5,10 @@ using JustChat.Application.Validators;
 using JustChat.Infrastructure.Constants;
 using JustChat.Infrastructure.DI.Resolvers;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace JustChat.Infrastructure.DI;
 
@@ -62,5 +64,29 @@ public static class ResolveDI
             ?? throw new InvalidOperationException("Blob Storage connection string is not configured.");
         
         builder.Services.AddSingleton(new BlobServiceClient(blobStorageConnectionString));
+    }
+
+    public static void ConfigureTextAnalytics(this WebApplicationBuilder builder)
+    {
+        var endpoint = builder.Configuration["TextAnalytics:Endpoint"]
+            ?? throw new InvalidOperationException("TextAnalytics Endpoint is not configured.");
+
+        builder.Services.AddAzureClients(clientBuilder =>
+        {
+            clientBuilder.AddTextAnalyticsClient(new Uri(endpoint));
+
+            clientBuilder.ConfigureDefaults(options => options.Retry.MaxRetries = 3);
+        });
+    }
+
+    public static void AddAzureSignalR(this IServiceCollection services, IConfiguration configuration)
+    {
+        var signalRConnectionString = configuration.GetConnectionString("AzureSignalR")
+            ?? throw new InvalidOperationException("SignalR connection string is not configured.");
+
+        services.AddSignalR().AddAzureSignalR(options =>
+        {
+            options.ConnectionString = signalRConnectionString;
+        });
     }
 }

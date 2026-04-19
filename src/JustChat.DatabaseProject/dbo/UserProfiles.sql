@@ -4,7 +4,6 @@
     [FirstName]                 NVARCHAR(100)     NULL,
     [LastName]                  NVARCHAR(100)     NULL,
     [ProfilePhotoUrl]           NVARCHAR(500)     NULL,
-    [ProfilePhotoPublicId]      NVARCHAR(200)     NULL,
     [CreatedAt]                 DATETIME2         NOT NULL DEFAULT GETUTCDATE(),
     [UpdatedAt]                 DATETIME2         NULL,
 

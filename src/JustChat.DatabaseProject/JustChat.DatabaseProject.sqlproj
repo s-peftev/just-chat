@@ -64,6 +64,7 @@
     <Build Include="dbo\AspNetUserLogins.sql" />
     <Build Include="dbo\UserProfiles.sql" />
     <Build Include="dbo\RefreshTokens.sql" />
+    <Build Include="dbo\Messages.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\Script.PostDeployment_InitData.sql" />
