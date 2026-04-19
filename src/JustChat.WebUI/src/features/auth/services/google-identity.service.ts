@@ -91,6 +91,8 @@ export class GoogleIdentityService {
       },
     });
 
+    const hostWidth = Math.round(host.getBoundingClientRect().width) || FALLBACK_BUTTON_WIDTH_PX;
+
     host.innerHTML = '';
     google.accounts.id.renderButton(host, {
       type: 'standard',
@@ -100,6 +102,7 @@ export class GoogleIdentityService {
       shape: 'rectangular',
       logo_alignment: 'left',
       locale: 'en',
+      width: hostWidth,
     });
   }
 
