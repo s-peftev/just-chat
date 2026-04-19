@@ -15,9 +15,12 @@ export function setMyProfile(myProfile: UserProfileDetails): PartialStateUpdater
 }
 
 export function setProfilePhoto(profilePhotoDto: ProfilePhoto | null): PartialStateUpdater<ProfileSlice> {
-    return _ => ({
-        profilePhotoUrl: profilePhotoDto?.profilePhotoUrl ?? null
-    })
+    return _ => {
+        const raw = profilePhotoDto?.profilePhotoUrl ?? null;
+        const profilePhotoUrl =
+            raw != null && raw.trim() !== "" ? profilePhotoUrlWithCacheBust(raw) : null;
+        return { profilePhotoUrl };
+    };
 }
 
 export function setPersonalInfo(personalInfo: ChangePersonalInfoRequest): PartialStateUpdater<ProfileSlice> {
@@ -25,4 +28,14 @@ export function setPersonalInfo(personalInfo: ChangePersonalInfoRequest): Partia
         firstName: personalInfo.firstName,
         lastName: personalInfo.lastName,
     })
+}
+
+/** Appends a cache-busting query param so the browser refetches after upload. */
+function profilePhotoUrlWithCacheBust(url: string): string {
+    const trimmed = url.trim();
+    if (!trimmed) {
+        return url;
+    }
+    const sep = trimmed.includes("?") ? "&" : "?";
+    return `${trimmed}${sep}t=${Date.now()}`;
 }

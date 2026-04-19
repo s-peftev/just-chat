@@ -59,6 +59,14 @@
   </div>
 </div>
 
+@if (cropModalOpen() && cropImageUrl(); as cropSrc) {
+  <app-profile-photo-crop-modal
+    [imageObjectUrl]="cropSrc"
+    (dismiss)="closeCropModal()"
+    (cropped)="onProfilePhotoCropped($event)"
+  />
+}
+
 @if (deletePhotoModalOpen()) {
   <div
     class="fixed inset-0 z-60 flex items-center justify-center p-4"
