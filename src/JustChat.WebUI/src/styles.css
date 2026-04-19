@@ -9,10 +9,15 @@ html, body {
 }
 
 /* Google Identity Services: center rendered control inside auth card host */
+.google-sign-in-host {
+  background: transparent;
+}
+
 .google-sign-in-host > div {
   width: 100%;
   display: flex;
   justify-content: center;
+  background: transparent;
 }
 
 .layout-wrapper {
