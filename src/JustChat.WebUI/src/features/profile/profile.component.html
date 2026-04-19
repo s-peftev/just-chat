@@ -1,27 +1,30 @@
-<div class="relative flex min-h-0 flex-1 flex-col font-sans text-neutral-100">
+<div class="relative flex min-h-0 w-full flex-1 flex-col font-sans text-neutral-100">
   @if (profileStore.isBusy()) {
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/10">
       <app-busy />
     </div>
   }
 
-  <div class="mx-auto w-full max-w-5xl flex-1 px-1 py-2 sm:px-2">
+  <div class="flex min-h-0 w-full flex-1 flex-col px-1 py-2 sm:px-2">
     <div
-      class="rounded-4xl border border-lime-900/30 bg-[#1c1c1e]/95 p-8 shadow-2xl shadow-black sm:p-10"
+      class="flex min-h-0 w-full flex-1 flex-col rounded-4xl border border-white/10 bg-white/10 p-5 shadow-2xl 
+        shadow-black/40 backdrop-blur-md sm:p-10"
     >
       <h1
-        class="mb-8 text-center text-4xl font-serif sm:text-5xl"
+        class="profile-title mb-5 shrink-0 text-center text-4xl font-serif sm:text-5xl"
         style="font-family: 'Copperplate', 'Times New Roman', serif"
       >
         Profile
       </h1>
 
-      <div class="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-12">
-        <div class="flex justify-center md:col-span-5 md:justify-start">
+      <div
+        class="profile-stack flex min-h-0 w-full min-w-0 flex-1 flex-col items-center justify-center gap-10"
+      >
+        <div class="profile-stack__photo flex w-full shrink-0 justify-center">
           <app-profile-photo-block />
         </div>
 
-        <div class="md:col-span-7">
+        <div class="profile-stack__info flex w-full min-w-0 max-w-sm flex-col items-stretch">
           <app-profile-personal-info />
         </div>
       </div>

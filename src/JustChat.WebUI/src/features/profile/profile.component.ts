@@ -8,6 +8,9 @@ import { ProfilePersonalInfoComponent } from './components/profile-personal-info
   selector: 'app-profile',
   imports: [BusyComponent, ProfilePhotoBlockComponent, ProfilePersonalInfoComponent],
   templateUrl: './profile.component.html',
+  host: {
+    class: 'flex min-h-0 w-full min-w-0 flex-1 flex-col',
+  },
 })
 export class ProfileComponent {
   protected readonly profileStore = inject(ProfileStore);

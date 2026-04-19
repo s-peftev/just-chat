@@ -2,7 +2,6 @@ import { Component, effect, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { ProfileStore } from '../../store/profile.store';
-import { AuthStore } from '../../../auth/store/auth.store';
 import { TextInputComponent } from '../../../../shared/components/text-input/text-input.component';
 import { USER_AUTH } from '../../../../core/constants/validation.constants';
 
@@ -16,7 +15,6 @@ export class ProfilePersonalInfoComponent {
   private readonly toastr = inject(ToastrService);
 
   protected readonly profileStore = inject(ProfileStore);
-  private readonly authStore = inject(AuthStore);
 
   protected readonly personalForm = this.fb.group({
     firstName: this.fb.control<string>('', {
@@ -56,9 +54,5 @@ export class ProfilePersonalInfoComponent {
           this.personalForm.markAsPristine();
         },
       });
-  }
-
-  protected logout(): void {
-    this.authStore.logout();
   }
 }

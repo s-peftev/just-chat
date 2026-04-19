@@ -1,13 +1,37 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { USER_PROFILE } from '../../../../core/constants/validation.constants';
+import {
+  FILE_VALIDATION_ERRORS,
+  fileSizeValidator,
+  fileTypeValidator,
+} from '../../../../shared/validators/file.validators';
 import { ProfileStore } from '../../store/profile.store';
+
+const maxAvatarBytes = USER_PROFILE.MAX_AVATAR_SIZE_MB * 1024 * 1024;
 
 @Component({
   selector: 'app-profile-photo-block',
   imports: [],
   templateUrl: './profile-photo-block.component.html',
+  host: {
+    class: 'block w-full min-w-[200px] max-w-[250px]',
+  },
 })
 export class ProfilePhotoBlockComponent {
+  private readonly toastr = inject(ToastrService);
   protected readonly profileStore = inject(ProfileStore);
+
+  protected readonly maxAvatarSizeMb = USER_PROFILE.MAX_AVATAR_SIZE_MB;
+  protected readonly avatarAccept = USER_PROFILE.AVATAR_ACCEPT;
+
+  protected readonly fileControl = new FormControl<File | null>(null, {
+    validators: [
+      fileSizeValidator(maxAvatarBytes),
+      fileTypeValidator(USER_PROFILE.AVATAR_ALLOWED_MIME_TYPES),
+    ],
+  });
 
   protected readonly initials = computed(() => {
     const f = this.profileStore.firstName()?.trim();
@@ -23,20 +47,69 @@ export class ProfilePhotoBlockComponent {
 
   protected readonly profilePhotoUrl = computed(() => this.profileStore.profilePhotoUrl());
 
+  /** Custom confirm dialog instead of `window.confirm` for deleting the avatar. */
+  protected readonly deletePhotoModalOpen = signal(false);
+
   protected onPhotoFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
-    if (file) this.profileStore.uploadProfilePhoto(file);
+    if (!file) {
+      return;
+    }
+
+    this.fileControl.setValue(file);
+
+    if (this.fileControl.valid) {
+      this.profileStore.uploadProfilePhoto(file);
+    } else {
+      this.showFileValidationErrors();
+    }
+
+    this.fileControl.setValue(null, { emitEvent: false });
+  }
+
+  private showFileValidationErrors(): void {
+    const errs = this.fileControl.errors;
+    if (!errs) {
+      return;
+    }
+
+    const parts: string[] = [];
+    if (errs[FILE_VALIDATION_ERRORS.fileSize]) {
+      parts.push(`File must be at most ${this.maxAvatarSizeMb} MB.`);
+    }
+    if (errs[FILE_VALIDATION_ERRORS.fileType]) {
+      parts.push(
+        `Invalid file type. Allowed formats: ${USER_PROFILE.AVATAR_ALLOWED_FORMATS_LABEL}.`,
+      );
+    }
+
+    if (parts.length > 0) {
+      this.toastr.error(parts.join(' '));
+    }
   }
 
   protected triggerPhotoInput(input: HTMLInputElement): void {
     input.click();
   }
 
+  protected openDeletePhotoModal(): void {
+    if (!this.profileStore.hasProfilePhoto()) {
+      return;
+    }
+    this.deletePhotoModalOpen.set(true);
+  }
+
+  protected closeDeletePhotoModal(): void {
+    this.deletePhotoModalOpen.set(false);
+  }
+
   protected confirmDeletePhoto(): void {
-    if (!this.profileStore.hasProfilePhoto()) return;
-    if (!globalThis.confirm('Remove your profile photo?')) return;
+    if (!this.profileStore.hasProfilePhoto()) {
+      return;
+    }
     this.profileStore.deleteProfilePhoto();
+    this.closeDeletePhotoModal();
   }
 }
