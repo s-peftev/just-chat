@@ -8,8 +8,7 @@ import { NavComponent } from './components/nav/nav.component';
     RouterOutlet,
     NavComponent
   ],
-  templateUrl: './home-layout.component.html',
-  styleUrl: './home-layout.component.css'
+  templateUrl: './home-layout.component.html'
 })
 export class HomeLayoutComponent {
 

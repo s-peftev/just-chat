@@ -1,13 +1,14 @@
 import { inject, Injectable } from "@angular/core";
 import { AuthStore } from "../../../features/auth/store/auth.store";
 import { catchError, map, Observable, of, switchMap, tap, timer } from "rxjs";
+import { ProfileStore } from "../../../features/profile/store/profile.store";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppInitService {
   private authStore = inject(AuthStore);
-  // private profileStore = inject(ProfileStore);
+  private profileStore = inject(ProfileStore);
 
   public initApp(): Observable<null> {
     const started = Date.now();
@@ -17,7 +18,7 @@ export class AppInitService {
 
       tap(() => {
         if (this.authStore.hasValidAccessToken()) {
-          // this.profileStore.getMyProfile();
+          this.profileStore.getMyProfile();
         }
       }),
 

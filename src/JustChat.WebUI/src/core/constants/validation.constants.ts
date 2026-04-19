@@ -4,3 +4,7 @@ export const USER_AUTH = {
     NAME_MAX_LENGTH: 20,
     EMAIL_MAX_LENGTH: 254,
 };
+
+export const USER_PROFILE = {
+    MAX_AVATAR_SIZE_MB: 4
+}

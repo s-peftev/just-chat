@@ -1,0 +1,43 @@
+<div class="flex min-w-0 flex-col gap-7">
+  <div class="flex flex-col gap-1.5">
+    <label class="text-sm font-medium text-white/80" for="profile-email">Email</label>
+    <div
+      class="w-full rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-base text-white/85 shadow-sm backdrop-blur-md"
+      id="profile-email"
+    >
+      {{ profileStore.email() ?? '—' }}
+    </div>
+    <p class="text-xs text-neutral-500">Email cannot be changed.</p>
+  </div>
+
+  <div class="h-13">
+    <app-text-input
+      [formControl]="$any(personalForm.controls['firstName'])"
+      [label]="'First name'"
+    />
+  </div>
+
+  <div class="h-13">
+    <app-text-input
+      [formControl]="$any(personalForm.controls['lastName'])"
+      [label]="'Last name'"
+    />
+  </div>
+
+  <button
+    type="button"
+    [disabled]="personalForm.invalid || personalForm.pristine"
+    class="btn btn-outline mt-2 h-12 w-full max-w-xs rounded-2xl border-lime-800/40 bg-lime-300 text-[#1a1a1a] shadow-lg shadow-lime-950/20 transition-all hover:bg-lime-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:border-gray-600 disabled:bg-white/40 disabled:text-neutral-500 sm:h-14 sm:text-lg sm:font-bold"
+    (click)="savePersonalInfo()"
+  >
+    Save
+  </button>
+
+  <button
+    type="button"
+    class="mt-4 w-fit text-left text-sm text-neutral-400 underline-offset-4 transition hover:text-white hover:underline"
+    (click)="logout()"
+  >
+    Log out
+  </button>
+</div>

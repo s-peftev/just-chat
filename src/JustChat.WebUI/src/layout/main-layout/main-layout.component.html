@@ -1,5 +1,8 @@
-<div class="layout-wrapper flex min-h-screen flex-col">
-    <main class="flex min-h-svh w-full flex-1 flex-col px-4">
-        <router-outlet />
-    </main>
+<div class="relative z-10 flex min-h-svh w-full min-w-0 items-start gap-4 p-4">
+  <aside class="w-full max-w-[min(20rem,calc(100%-2rem))] shrink-0">
+    <app-side-bar class="block w-full" />
+  </aside>
+  <main class="flex min-h-svh min-w-0 flex-1 flex-col px-4">
+    <router-outlet />
+  </main>
 </div>

@@ -1,16 +1,14 @@
 import { Component, inject } from '@angular/core';
-import { AuthStore } from '../auth/store/auth.store';
+import { ProfileStore } from './store/profile.store';
+import { BusyComponent } from '../../shared/components/busy/busy.component';
+import { ProfilePhotoBlockComponent } from './components/profile-photo-block/profile-photo-block.component';
+import { ProfilePersonalInfoComponent } from './components/profile-personal-info/profile-personal-info.component';
 
 @Component({
   selector: 'app-profile',
-  imports: [],
+  imports: [BusyComponent, ProfilePhotoBlockComponent, ProfilePersonalInfoComponent],
   templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
-  public authStore = inject(AuthStore);
-
-  public logout() {
-    this.authStore.logout();
-  }
+  protected readonly profileStore = inject(ProfileStore);
 }
