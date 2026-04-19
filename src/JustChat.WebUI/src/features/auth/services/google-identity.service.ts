@@ -42,7 +42,7 @@ export class GoogleIdentityService {
 
       google.accounts.id.initialize({
         client_id: clientId,
-        callback: (response) => {
+        callback: (response: { credential: any; }) => {
           const token = response.credential;
           if (token) {
             this.ngZone.run(() => onCredential(token));

@@ -1,4 +1,30 @@
-<div (click)="logout()" class="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 cursor-pointer">
-    
-    <span class="ml-2">log_out</span>
+<div class="relative flex min-h-0 flex-1 flex-col font-sans text-neutral-100">
+  @if (profileStore.isBusy()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/10">
+      <app-busy />
+    </div>
+  }
+
+  <div class="mx-auto w-full max-w-5xl flex-1 px-1 py-2 sm:px-2">
+    <div
+      class="rounded-4xl border border-lime-900/30 bg-[#1c1c1e]/95 p-8 shadow-2xl shadow-black sm:p-10"
+    >
+      <h1
+        class="mb-8 text-center text-4xl font-serif sm:text-5xl"
+        style="font-family: 'Copperplate', 'Times New Roman', serif"
+      >
+        Profile
+      </h1>
+
+      <div class="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-12">
+        <div class="flex justify-center md:col-span-5 md:justify-start">
+          <app-profile-photo-block />
+        </div>
+
+        <div class="md:col-span-7">
+          <app-profile-personal-info />
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

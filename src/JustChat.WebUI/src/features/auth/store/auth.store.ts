@@ -21,6 +21,7 @@ import { setAccessToken, setPasswordResetRequested } from "./auth.updaters";
 import { AccessToken } from "../../../dto/auth/access-token.dto";
 import { RegisterRequest } from "../../../dto/auth/register-request.dto";
 import { GoogleLoginRequest } from "../../../dto/auth/google-login-request.dto";
+import { ProfileStore } from "../../profile/store/profile.store";
 
 export const AuthStore = signalStore(
     { providedIn: 'root' },
@@ -29,11 +30,11 @@ export const AuthStore = signalStore(
     withLocalError(),
     withProps(() => {
         const _authService = inject(AuthService);
-        //const _profileStore = inject(ProfileStore);
+        const _profileStore = inject(ProfileStore);
 
         return {
             _authService,
-            //_profileStore
+            _profileStore
         }
     }),
     withComputed((store) => {
@@ -72,7 +73,7 @@ export const AuthStore = signalStore(
                                     setAccessToken(response),
                                     clearError());
                                 
-                                // store._profileStore.getMyProfile();
+                                store._profileStore.getMyProfile();
 
                                 router.navigate([ROUTES.PROFILE]);
                             },
@@ -101,7 +102,7 @@ export const AuthStore = signalStore(
                                     setAccessToken(response),
                                     clearError());
                                 
-                                // store._profileStore.getMyProfile();
+                                store._profileStore.getMyProfile();
 
                                 router.navigate([ROUTES.PROFILE]);
                             },
@@ -126,7 +127,7 @@ export const AuthStore = signalStore(
                     store._authService.logout().pipe(
                         finalize(() => {
                             patchState(store, initialAuthSlice, setIdle());
-                            // store._profileStore.resetState();
+                            store._profileStore.resetState();
                             router.navigate([ROUTES.AUTH.LOGIN]);
                         })
                     )
@@ -152,7 +153,7 @@ export const AuthStore = signalStore(
                     store._authService.register(request).pipe(
                         tapResponse({
                             next: response => {
-                                // store._profileStore.getMyProfile();
+                                store._profileStore.getMyProfile();
 
                                 patchState(store,
                                     setAccessToken(response),
