@@ -8,6 +8,9 @@ import { MessageSentiment } from '../../core/enums/message-sentiment.enum';
 
 @Component({
   selector: 'app-chat',
+  host: {
+    class: 'flex min-h-0 min-w-0 flex-1 flex-col',
+  },
   providers: [ChatStore],
   imports: [
     NgFor,
@@ -20,6 +23,7 @@ import { MessageSentiment } from '../../core/enums/message-sentiment.enum';
 })
 export class ChatComponent implements AfterViewInit {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef<HTMLElement>;
+  @ViewChild('messageInput') private messageInput?: ElementRef<HTMLInputElement>;
   @ViewChildren('messageItem') private messageItems!: QueryList<ElementRef<HTMLElement>>;
   
   public profileStore = inject(ProfileStore);
@@ -66,6 +70,8 @@ export class ChatComponent implements AfterViewInit {
       this.pendingForceScroll = true;
       this.clearForceScrollOnLoadFlag();
     }
+
+    queueMicrotask(() => this.messageInput?.nativeElement.focus());
   }
 
   public sendMessage(): void {
