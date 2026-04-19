@@ -45,19 +45,8 @@ export class GoogleIdentityService {
     await this.ensureScriptLoaded();
     await this.waitForNextPaint();
 
-    let width = this.computeButtonWidth(host);
-    if (width === 0) {
-      await this.waitForNextPaint();
-      width = this.computeButtonWidth(host);
-    }
-    if (width === 0) {
-      width = Math.max(280, FALLBACK_BUTTON_WIDTH_PX);
-    }
-
     this.ngZone.runOutsideAngular(() => {
-      this.renderGisButton(host, clientId, onCredential, width);
-      this.lastRenderedWidth.set(host, width);
-      this.attachResizeObserver(host, clientId, onCredential);
+      this.renderGisButton(host, clientId, onCredential);;
     });
   }
 
@@ -72,7 +61,6 @@ export class GoogleIdentityService {
       clearTimeout(timer);
       this.resizeDebounceTimers.delete(host);
     }
-    this.lastRenderedWidth.delete(host);
   }
 
   private waitForNextPaint(): Promise<void> {
@@ -83,26 +71,10 @@ export class GoogleIdentityService {
     });
   }
 
-  /**
-   * Returns 0 if the host has no laid-out width yet; otherwise at least 280 (GIS minimum).
-   */
-  private computeButtonWidth(host: HTMLElement): number {
-    const raw =
-      host.getBoundingClientRect().width ||
-      host.clientWidth ||
-      host.offsetWidth;
-    const floored = Math.floor(raw);
-    if (floored <= 0) {
-      return 0;
-    }
-    return Math.max(280, floored);
-  }
-
   private renderGisButton(
     host: HTMLElement,
     clientId: string,
     onCredential: (idToken: string) => void,
-    width: number,
   ): void {
     const google = window.google;
     if (!google?.accounts?.id) {
@@ -126,44 +98,9 @@ export class GoogleIdentityService {
       size: 'large',
       text: 'continue_with',
       shape: 'rectangular',
-      width,
       logo_alignment: 'left',
       locale: 'en',
     });
-  }
-
-  private attachResizeObserver(
-    host: HTMLElement,
-    clientId: string,
-    onCredential: (idToken: string) => void,
-  ): void {
-    const observer = new ResizeObserver(() => {
-      const existing = this.resizeDebounceTimers.get(host);
-      if (existing !== undefined) {
-        clearTimeout(existing);
-      }
-      const timer = setTimeout(() => {
-        this.resizeDebounceTimers.delete(host);
-        const newWidth = this.computeButtonWidth(host);
-        if (newWidth === 0) {
-          return;
-        }
-        const last = this.lastRenderedWidth.get(host);
-        if (
-          last !== undefined &&
-          Math.abs(last - newWidth) <= WIDTH_CHANGE_THRESHOLD_PX
-        ) {
-          return;
-        }
-        this.ngZone.runOutsideAngular(() => {
-          this.renderGisButton(host, clientId, onCredential, newWidth);
-          this.lastRenderedWidth.set(host, newWidth);
-        });
-      }, RESIZE_DEBOUNCE_MS);
-      this.resizeDebounceTimers.set(host, timer);
-    });
-    observer.observe(host);
-    this.resizeObservers.set(host, observer);
   }
 
   private ensureScriptLoaded(): Promise<void> {
