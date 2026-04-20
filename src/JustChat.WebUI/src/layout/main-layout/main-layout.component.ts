@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ChatStore } from '../../features/chat/store/chat.store';
 import { SideBarComponent } from './components/side-bar/side-bar.component';
 
 @Component({
@@ -11,6 +12,7 @@ import { SideBarComponent } from './components/side-bar/side-bar.component';
     RouterOutlet,
     SideBarComponent,
   ],
+  providers: [ChatStore],
   templateUrl: './main-layout.component.html'
 })
 export class MainLayoutComponent {
