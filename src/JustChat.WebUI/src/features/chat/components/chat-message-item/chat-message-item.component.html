@@ -1,0 +1,51 @@
+<ng-container *ngIf="!isOwnMessage(); else ownMessage">
+  <div class="flex max-w-[75%] items-end gap-2">
+    <div class="flex w-14 shrink-0 justify-center">
+      <div
+        *ngIf="showIncomingAvatar()"
+        (mouseenter)="onAvatarEnter($event)"
+        (mouseleave)="senderAvatarLeave.emit()"
+      >
+        <img
+          *ngIf="hasPhotoUrl(message().sender.profilePhotoUrl)"
+          [src]="message().sender.profilePhotoUrl!"
+          [alt]=""
+          class="h-14 w-14 cursor-default rounded-full object-cover"
+        />
+        <div
+          *ngIf="!hasPhotoUrl(message().sender.profilePhotoUrl)"
+          class="flex h-14 w-14 cursor-default items-center justify-center rounded-full bg-white/10 text-xl font-semibold leading-none text-neutral-200 select-none"
+          aria-hidden="true"
+        >
+          {{ userInitials(message().sender) }}
+        </div>
+      </div>
+    </div>
+    <div
+      class="min-w-0 flex-1 rounded-xl rounded-bl-none border border-white/10 bg-black/25 px-4 py-2 text-neutral-100 backdrop-blur-md wrap-break-word"
+    >
+      <p class="whitespace-pre-wrap wrap-break-word text-sm leading-snug">
+        {{ message().text }}
+      </p>
+      <span class="mt-1 block text-[10px] opacity-80 text-neutral-100">
+        {{ message().createdAt | date: 'medium' }}
+        |
+        {{ messageSentiments[message().sentiment] }}
+      </span>
+    </div>
+  </div>
+</ng-container>
+<ng-template #ownMessage>
+  <div
+    class="max-w-[75%] rounded-xl border border-white/10 bg-white/25 px-4 py-2 text-neutral-100 wrap-break-word"
+  >
+    <p class="whitespace-pre-wrap wrap-break-word text-sm leading-snug">
+      {{ message().text }}
+    </p>
+    <span class="mt-1 block text-[10px] opacity-80 text-neutral-100">
+      {{ message().createdAt | date: 'medium' }}
+      |
+      {{ messageSentiments[message().sentiment] }}
+    </span>
+  </div>
+</ng-template>
