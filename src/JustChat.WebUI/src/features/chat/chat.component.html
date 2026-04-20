@@ -60,7 +60,6 @@
                   <div
                     *ngIf="showIncomingAvatarForMessageAt(i)"
                     (mouseenter)="onSenderAvatarEnter($event, message.sender)"
-                    (mousemove)="onSenderAvatarMove($event)"
                     (mouseleave)="onSenderAvatarLeave()"
                   >
                     <img
@@ -134,10 +133,28 @@
           (keydown)="onMessageInputKeydown($event)"
           placeholder="Type a message..."
           class="box-border max-h-32 min-h-12 w-full resize-none overflow-y-auto border-0 bg-transparent 
-            px-4 py-[0.65rem] pr-14 leading-normal text-neutral-100 placeholder:text-neutral-300/50 focus:outline-none"
+            px-4 py-[0.65rem] pr-24 leading-normal text-neutral-100 placeholder:text-neutral-300/50 focus:outline-none"
         ></textarea>
 
-        <emoji-picker (emoji-click)="onEmojiClick($event)"></emoji-picker>
+        <button
+          type="button"
+          class="absolute bottom-3 right-18 flex h-11 w-11 cursor-default items-center 
+            justify-center text-xl text-neutral-300/50 transition hover:text-neutral-200"
+          aria-label="Emoji picker"
+          (mouseenter)="onEmojiTriggerEnter($event)"
+          (mouseleave)="onEmojiTriggerLeave()"
+        >
+          <span aria-hidden="true">
+            <svg 
+              width="32"
+              height="32" 
+              viewBox="0 0 16 16" 
+              fill="currentColor"
+              >
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M4.111 2.18a7 7 0 1 1 7.778 11.64A7 7 0 0 1 4.11 2.18zm.556 10.809a6 6 0 1 0 6.666-9.978 6 6 0 0 0-6.666 9.978zM6.5 7a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm5 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM8 11a3 3 0 0 1-2.65-1.58l-.87.48a4 4 0 0 0 7.12-.16l-.9-.43A3 3 0 0 1 8 11z"/>
+            </svg>
+          </span>
+        </button>
 
         <button
           (click)="sendMessage()"
@@ -164,15 +181,15 @@
     </div>
   </div>
 
-  <ng-container *ngIf="avatarTooltipSender as sender">
-    <div
-      role="tooltip"
-      class="fixed z-300 w-max max-w-[min(90vw,18rem)] rounded-2xl border border-white/15 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur-md"
-      [style.left.px]="senderTooltipLeftPx"
-      [style.top.px]="senderTooltipTopPx"
-      (mouseenter)="onSenderTooltipPopoverEnter()"
-      (mouseleave)="onSenderTooltipPopoverLeave()"
-    >
+  <app-float-tooltip
+    [visible]="avatarTooltipSender !== null"
+    [leftPx]="senderTooltipLeftPx"
+    [topPx]="senderTooltipTopPx"
+    panelClass="w-max max-w-[min(90vw,18rem)] rounded-2xl border border-white/15 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur-md"
+    (popoverEnter)="onSenderTooltipPopoverEnter()"
+    (popoverLeave)="onSenderTooltipPopoverLeave()"
+  >
+    @if (avatarTooltipSender; as sender) {
       <img
         *ngIf="hasPhotoUrl(sender.profilePhotoUrl)"
         [src]="sender.profilePhotoUrl!"
@@ -192,6 +209,17 @@
       <p *ngIf="userDisplayName(sender)" class="mt-1 text-center text-sm text-neutral-400">
         {{ userDisplayName(sender) }}
       </p>
-    </div>
-  </ng-container>
+    }
+  </app-float-tooltip>
+
+  <app-float-tooltip
+    [visible]="emojiTooltipVisible"
+    [leftPx]="emojiTooltipLeftPx"
+    [topPx]="emojiTooltipTopPx"
+    panelClass="rounded-2xl border border-white/15 bg-zinc-950/95 p-2 shadow-2xl backdrop-blur-md overflow-hidden"
+    (popoverEnter)="onEmojiTooltipPopoverEnter()"
+    (popoverLeave)="onEmojiTooltipPopoverLeave()"
+  >
+    <emoji-picker (emoji-click)="onEmojiClick($event)"></emoji-picker>
+  </app-float-tooltip>
 </div>
