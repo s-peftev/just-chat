@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Component,
+  CUSTOM_ELEMENTS_SCHEMA,
   effect,
   ElementRef,
   HostListener,
@@ -36,7 +37,8 @@ const CHAT_SCROLL_TOP_STORAGE_KEY = 'chat:scrollTop';
     FormsModule,
     DatePipe
   ],
-  templateUrl: './chat.component.html'
+  templateUrl: './chat.component.html',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef<HTMLElement>;
@@ -344,6 +346,12 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
       this.pendingForceScroll = true;
       this.scrollToBottom('auto');
     }
+  }
+
+  public onEmojiClick(event: any) {
+    const emoji = event.detail.unicode;
+
+    this.inputedMessage += emoji;
   }
 
   private scrollToBottom(behavior: ScrollBehavior): void {

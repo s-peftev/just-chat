@@ -116,8 +116,9 @@
         *ngIf="showScrollToBottom"
         type="button"
         (click)="scrollToLatest()"
-        class="absolute bottom-20 right-4 w-10 h-10 rounded-full border border-lime-400/40 bg-lime-500/25 text-neutral-100 backdrop-blur-sm hover:bg-lime-400/35
-               flex items-center justify-center shadow-lg shadow-black/40 transition"
+        class="absolute bottom-20 right-4 w-10 h-10 rounded-full border border-lime-400/40 bg-lime-500/25 
+          text-neutral-100 backdrop-blur-sm hover:bg-lime-400/35
+            flex items-center justify-center shadow-lg shadow-black/40 transition"
         aria-label="Scroll to latest message"
       >
         <span class="text-lg">↓</span>
@@ -132,17 +133,31 @@
           (input)="adjustMessageInputHeight()"
           (keydown)="onMessageInputKeydown($event)"
           placeholder="Type a message..."
-          class="box-border max-h-32 min-h-12 w-full resize-none overflow-y-auto border-0 bg-transparent px-4 py-[0.65rem] pr-14 leading-normal text-neutral-100
-            placeholder:text-neutral-200 focus:outline-none"
+          class="box-border max-h-32 min-h-12 w-full resize-none overflow-y-auto border-0 bg-transparent 
+            px-4 py-[0.65rem] pr-14 leading-normal text-neutral-100 placeholder:text-neutral-300/50 focus:outline-none"
         ></textarea>
+
+        <emoji-picker (emoji-click)="onEmojiClick($event)"></emoji-picker>
 
         <button
           (click)="sendMessage()"
           type="button"
-          class="absolute bottom-3 right-4 flex h-9 w-9 items-center justify-center rounded-full border border-lime-400/40 bg-lime-500/30 text-neutral-100
-                 backdrop-blur-sm transition hover:bg-lime-400/35"
+          class="absolute bottom-3 right-4 flex h-11 w-11 items-center justify-center 
+          text-neutral-300/50 cursor-pointer active:text-lime-400/50"
         >
-        SEND
+          <svg 
+            viewBox="0 0 24 24" 
+            width="22" 
+            height="22" 
+            stroke="currentColor" 
+            stroke-width="2" 
+            fill="none" 
+            stroke-linecap="round" 
+            stroke-linejoin="round"
+          >
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
         </button>
       </div>
 
@@ -152,7 +167,7 @@
   <ng-container *ngIf="avatarTooltipSender as sender">
     <div
       role="tooltip"
-      class="fixed z-[300] w-max max-w-[min(90vw,18rem)] rounded-2xl border border-white/15 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur-md"
+      class="fixed z-300 w-max max-w-[min(90vw,18rem)] rounded-2xl border border-white/15 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur-md"
       [style.left.px]="senderTooltipLeftPx"
       [style.top.px]="senderTooltipTopPx"
       (mouseenter)="onSenderTooltipPopoverEnter()"

@@ -59,7 +59,7 @@ public class ChatHub(
     public async Task SendMessageAsync(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
-            throw new HubException("Invalid message length.");
+            return;
 
         var ct = Context.ConnectionAborted;
         var userId = GetUserProfileId();
