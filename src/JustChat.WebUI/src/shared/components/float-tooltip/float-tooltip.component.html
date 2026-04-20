@@ -1,0 +1,14 @@
+@if (visible()) {
+  <div
+    role="tooltip"
+    class="fixed z-300"
+    [style.left.px]="leftPx()"
+    [style.top.px]="topPx()"
+    (mouseenter)="popoverEnter.emit()"
+    (mouseleave)="popoverLeave.emit()"
+  >
+    <div [class]="panelClass()">
+      <ng-content />
+    </div>
+  </div>
+}

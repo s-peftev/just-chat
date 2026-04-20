@@ -14,6 +14,7 @@ import { ValidationErrorsPipe } from '../../../core/pipes/validation-errors.pipe
 })
 export class TextInputComponent implements ControlValueAccessor {
   public label = input<string>('');
+  public placeholder = input<string>('');
   public type = input<'text' | 'password' | 'email' | 'date'>('text');
   public controlId = input<string | undefined>(undefined);
 
