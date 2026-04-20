@@ -8,6 +8,7 @@ import {
   fileTypeValidator,
 } from '../../../../shared/validators/file.validators';
 import { ProfilePhotoCropModalComponent } from '../profile-photo-crop-modal/profile-photo-crop-modal.component';
+import { userInitialsFromDetails } from '../../../../core/utils/user-initials';
 import { ProfileStore } from '../../store/profile.store';
 
 const maxAvatarBytes = USER_PROFILE.MAX_AVATAR_SIZE_MB * 1024 * 1024;
@@ -34,17 +35,13 @@ export class ProfilePhotoBlockComponent {
     ],
   });
 
-  protected readonly initials = computed(() => {
-    const f = this.profileStore.firstName()?.trim();
-    const l = this.profileStore.lastName()?.trim();
-    const a = f?.[0];
-    const b = l?.[0];
-    if (a && b) return `${a}${b}`.toUpperCase();
-    if (a) return a.toUpperCase();
-    if (b) return b.toUpperCase();
-    const email = this.profileStore.email()?.trim();
-    return email ? email[0]!.toUpperCase() : '?';
-  });
+  protected readonly initials = computed(() =>
+    userInitialsFromDetails({
+      firstName: this.profileStore.firstName(),
+      lastName: this.profileStore.lastName(),
+      email: this.profileStore.email(),
+    }),
+  );
 
   protected readonly profilePhotoUrl = computed(() => this.profileStore.profilePhotoUrl());
 
