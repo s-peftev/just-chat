@@ -40,7 +40,10 @@ const CHAT_SCROLL_TOP_STORAGE_KEY = 'chat:scrollTop';
 })
 export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef<HTMLElement>;
-  @ViewChild('messageInput') private messageInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('messageInput') private messageInput?: ElementRef<HTMLTextAreaElement>;
+
+  private readonly messageInputMinHeightPx = 48;
+  private readonly messageInputMaxHeightPx = 128;
   @ViewChildren('messageItem') private messageItems!: QueryList<ElementRef<HTMLElement>>;
   
   public profileStore = inject(ProfileStore);
@@ -157,7 +160,10 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
       this.hasInitialScrolled = true;
     }
 
-    queueMicrotask(() => this.messageInput?.nativeElement.focus());
+    queueMicrotask(() => {
+      this.messageInput?.nativeElement.focus();
+      this.adjustMessageInputHeight();
+    });
   }
 
   protected userInitials(user: UserProfileDetails): string {
@@ -166,6 +172,23 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
 
   protected hasPhotoUrl(url: string | null | undefined): boolean {
     return hasProfilePhotoUrl(url);
+  }
+
+  /**
+   * Incoming messages: show avatar only on the last message in a run from the same sender
+   * (next message is missing or from someone else).
+   */
+  protected showIncomingAvatarForMessageAt(index: number): boolean {
+    const items = this.chatStore.chatMessages().items;
+    const cur = items[index];
+    if (!cur || cur.sender.email === this.profileStore.email()) {
+      return false;
+    }
+    const next = items[index + 1];
+    if (!next) {
+      return true;
+    }
+    return next.sender.userId !== cur.sender.userId;
   }
 
   protected onSenderAvatarEnter(event: MouseEvent, sender: UserProfileDetails): void {
@@ -236,6 +259,57 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
   public sendMessage(): void {
     this.chatStore.sendMessage(this.inputedMessage);
     this.inputedMessage = "";
+    queueMicrotask(() => {
+      requestAnimationFrame(() => {
+        const el = this.messageInput?.nativeElement;
+        if (el) {
+          el.style.height = `${this.messageInputMinHeightPx}px`;
+        }
+        this.adjustMessageInputHeight();
+      });
+    });
+  }
+
+  protected adjustMessageInputHeight(): void {
+    const el = this.messageInput?.nativeElement;
+    if (!el) {
+      return;
+    }
+    el.style.height = "auto";
+    const h = Math.min(
+      Math.max(el.scrollHeight, this.messageInputMinHeightPx),
+      this.messageInputMaxHeightPx,
+    );
+    el.style.height = `${h}px`;
+  }
+
+  protected onMessageInputKeydown(event: KeyboardEvent): void {
+    if (event.key !== "Enter" || event.isComposing) {
+      return;
+    }
+    if (event.shiftKey) {
+      return;
+    }
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      const el = this.messageInput?.nativeElement;
+      if (!el) {
+        return;
+      }
+      const start = el.selectionStart ?? 0;
+      const end = el.selectionEnd ?? 0;
+      const v = this.inputedMessage;
+      this.inputedMessage = `${v.slice(0, start)}\n${v.slice(end)}`;
+      queueMicrotask(() => {
+        const pos = start + 1;
+        el.selectionStart = pos;
+        el.selectionEnd = pos;
+        this.adjustMessageInputHeight();
+      });
+      return;
+    }
+    event.preventDefault();
+    this.sendMessage();
   }
 
   public onScroll(): void {
