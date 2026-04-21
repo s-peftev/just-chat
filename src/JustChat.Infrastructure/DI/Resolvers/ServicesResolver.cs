@@ -23,6 +23,7 @@ internal static class ServicesResolver
         services.AddSingleton<IGoogleIdTokenReader, GoogleIdTokenReader>();
         services.AddSingleton<IChatOnlineTracker, ChatOnlineTracker>();
         services.AddSingleton<ISentimentService, AzureSentimentService>();
+        services.AddSingleton<IMessageBusService, AzureServiceBusService>();
 
         services.AddScoped<IAppUserService, AppUserService>();
         services.AddScoped<IRefreshTokenCookieWriter, RefreshTokenCookieWriter>();

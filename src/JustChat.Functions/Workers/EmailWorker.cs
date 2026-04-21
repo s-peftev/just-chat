@@ -15,12 +15,12 @@ public class EmailWorker(
         ILogger<EmailWorker> logger)
 {
     private readonly EmailClient _emailClient = emailClient;
-    private readonly string _senderEmail = config[ServiceBusConfig.SenderEmail]!;
+    private readonly string _senderEmail = config[WorkerConfig.SenderEmail]!;
     private readonly IEnumerable<IEmailStrategy> _strategies = strategies;
     private readonly ILogger<EmailWorker> _logger = logger;
 
     [Function("SendEmail")]
-    public async Task Run([ServiceBusTrigger(ServiceBusConfig.EmailQueueName, Connection = ServiceBusConfig.ServiceBusConnection)] EmailNotification msg)
+    public async Task Run([ServiceBusTrigger(WorkerConfig.EmailQueueName, Connection = WorkerConfig.ServiceBusConnection)] EmailNotification msg)
     {
         try
         {

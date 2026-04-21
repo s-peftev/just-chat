@@ -27,6 +27,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.ConfigureCorsPolicy(builder.Configuration);
 builder.Services.AddAzureSignalR(builder.Configuration);
+builder.Services.AddAzureServiceBus(builder.Configuration);
 
 SerilogConfigurator.Configure();
 builder.Host.UseSerilog();

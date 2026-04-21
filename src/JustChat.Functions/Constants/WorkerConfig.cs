@@ -1,6 +1,6 @@
 ﻿namespace JustChat.Functions.Constants;
 
-public static class ServiceBusConfig
+public static class WorkerConfig
 {
     public const string ServiceBusConnection = "ServiceBusConnection";
     public const string AcsConnectionString = "AcsConnectionString";

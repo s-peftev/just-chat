@@ -10,7 +10,7 @@ var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
     .ConfigureServices((context, services) =>
     {
-        var acsConnectionString = context.Configuration[ServiceBusConfig.AcsConnectionString];
+        var acsConnectionString = context.Configuration[WorkerConfig.AcsConnectionString];
         services.AddSingleton(new EmailClient(acsConnectionString));
 
         services.AddSingleton<ITemplateService, TemplateService>();
