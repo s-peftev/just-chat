@@ -11,7 +11,18 @@ var host = new HostBuilder()
     .ConfigureServices((context, services) =>
     {
         var acsConnectionString = context.Configuration[WorkerConfig.AcsConnectionString];
-        services.AddSingleton(new EmailClient(acsConnectionString));
+
+        var acsOptions = new EmailClientOptions
+        {
+            Retry =
+            {
+                Delay = TimeSpan.FromSeconds(2),
+                MaxRetries = 3,
+                Mode = Azure.Core.RetryMode.Exponential,
+                MaxDelay = TimeSpan.FromSeconds(10)
+            }
+        };
+        services.AddSingleton(new EmailClient(acsConnectionString, acsOptions));
 
         services.AddSingleton<ITemplateService, TemplateService>();
 

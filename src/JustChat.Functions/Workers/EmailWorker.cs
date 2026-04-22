@@ -43,9 +43,7 @@ public class EmailWorker(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing email notification for {Recipient}", msg.Email);
-
-            throw;
+            _logger.LogError(ex, "Permanent error for {Recipient}", msg.Email);
         }
     }
 }
