@@ -58,6 +58,15 @@ stages:
         solution: '**/JustChat.DatabaseProject.sqlproj'
         msbuildArguments: '/p:OutDir=$(Build.ArtifactStagingDirectory)/Database'
 
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Worker'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '$(workerPath)'
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/worker'
+        zipAfterPublish: true
+
     - task: PublishBuildArtifacts@1
       displayName: 'Upload Artifacts'
       inputs:
@@ -112,3 +121,11 @@ stages:
               package: '$(Pipeline.Workspace)/$(artifactName)/Angular/AngularUI.zip'
               runtimeStack: 'NODE|20-lts'
               startUpCommand: 'pm2 serve /home/site/wwwroot --no-daemon --spa'
+          
+          - task: AzureFunctionApp@1
+            displayName: 'Deploy Azure Function (Worker)'
+            inputs:
+              azureSubscription: 'sc-liferoadmap-dev'
+              appType: 'functionApp'
+              appName: '$(FunctionNameApp)'
+              package: '$(Pipeline.Workspace)/$(artifactName)/worker/LR.Functions.zip'

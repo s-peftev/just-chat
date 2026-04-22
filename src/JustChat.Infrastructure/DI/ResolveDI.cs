@@ -1,4 +1,5 @@
 ﻿using Azure.Identity;
+using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using FluentValidation;
 using JustChat.Application.Validators;
@@ -87,6 +88,24 @@ public static class ResolveDI
         services.AddSignalR().AddAzureSignalR(options =>
         {
             options.ConnectionString = signalRConnectionString;
+        });
+    }
+
+    public static void AddAzureServiceBus(this IServiceCollection services, IConfiguration configuration)
+    {
+        var sbConnectionString = configuration.GetConnectionString("ServiceBusConnection")
+            ?? throw new InvalidOperationException("ServiceBus connection string is not configured.");
+
+        var emailQueueName = configuration.GetSection("ServiceBusSettings")["EmailQueueName"]
+            ?? throw new ArgumentNullException("EmailQueueName is missing in configuration.");
+
+        services.AddSingleton(sp => new ServiceBusClient(sbConnectionString));
+
+        services.AddSingleton(sp =>
+        {
+            var client = sp.GetRequiredService<ServiceBusClient>();
+
+            return client.CreateSender(emailQueueName);
         });
     }
 }

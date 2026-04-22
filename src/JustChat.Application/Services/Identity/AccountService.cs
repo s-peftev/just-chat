@@ -1,14 +1,18 @@
 ﻿using JustChat.Application.AppResult;
 using JustChat.Application.AppResult.Errors;
 using JustChat.Application.Interfaces.Entities;
+using JustChat.Application.Interfaces.ExternalProviders;
 using JustChat.Application.Interfaces.Identity;
 using JustChat.Application.Interfaces.Persistence;
 using JustChat.Application.Interfaces.System;
 using JustChat.Application.Interfaces.Utils;
 using JustChat.Application.Options;
+using JustChat.Contracts.DTOs;
 using JustChat.Contracts.DTOs.Identity;
+using JustChat.Contracts.Enums;
 using JustChat.Contracts.Requests.Identity;
 using JustChat.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace JustChat.Application.Services.Identity;
@@ -16,13 +20,15 @@ namespace JustChat.Application.Services.Identity;
 public class AccountService(
     IAppUserService appUserService,
     ITokenService tokenService,
+    IMessageBusService messageBusService,
     IGoogleIdTokenReader googleIdTokenReader,
     IOptions<RefreshTokenOptions> refreshTokenOptions,
     IRequestInfoService requestInfoService,
     IDateTimeProvider dateTimeProvider,
     IRefreshTokenService refreshTokenService,
     IUserProfileService userProfileService,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    ILogger<AccountService> logger 
     ) : IAccountService
 {
     public async Task<Result<AuthResultDto>> LoginAsync(UserLoginRequest request, CancellationToken ct = default)
@@ -47,6 +53,7 @@ public class AccountService(
         await unitOfWork.BeginTransactionAsync(ct);
 
         UserAuthDto? userAuth;
+        bool requiresUserProfile;
 
         try
         {
@@ -60,8 +67,10 @@ public class AccountService(
             }
 
             var provision = provisionResult.Value;
+            requiresUserProfile = provision.RequiresUserProfile;
 
-            if (provision.RequiresUserProfile)
+            // Create profile for new users or update existing ones with google profile photo if they don't have one yet
+            if (requiresUserProfile)
             {
                 var (firstName, lastName) = SplitGoogleDisplayName(payload.Name);
                 var profile = userProfileService.AddForNewUser(provision.UserAuth.UserId, firstName, lastName);
@@ -89,6 +98,18 @@ public class AccountService(
         {
             await unitOfWork.RollbackTransactionAsync(ct);
             throw;
+        }
+
+        if (requiresUserProfile)
+        {
+            try
+            {
+                await messageBusService.PublishEmailNotification(new EmailNotification(payload.Email, EmailType.Welcome), ct);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to send welcome email to {Email}", payload.Email);
+            }
         }
 
         return await AuthenticateUserAsync(userAuth!, ct: ct);
@@ -187,6 +208,15 @@ public class AccountService(
         {
             await unitOfWork.RollbackTransactionAsync(ct);
             throw;
+        }
+
+        try 
+        {
+            await messageBusService.PublishEmailNotification(new EmailNotification(registeredUser.Email, EmailType.Welcome), ct);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to send welcome email to {Email}", registeredUser.Email);
         }
 
         return await AuthenticateUserAsync(registeredUser!, ct: ct);

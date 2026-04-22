@@ -6,6 +6,7 @@
     <Deploy />
   </Project>
   <Project Path="../JustChat.Domain/JustChat.Domain.csproj" />
+  <Project Path="../JustChat.Functions/JustChat.Functions.csproj" Id="93a91abd-c156-4d12-b501-0b3fdc873b9d" />
   <Project Path="../JustChat.Infrastructure/JustChat.Infrastructure.csproj" />
   <Project Path="JustChat.API.csproj" />
 </Solution>
