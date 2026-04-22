@@ -21,9 +21,8 @@ import { FloatTooltipComponent } from '../../shared/components/float-tooltip/flo
 import { ChatActiveUsersComponent } from './components/chat-active-users/chat-active-users.component';
 import { ChatMessagesListComponent } from './components/chat-messages-list/chat-messages-list.component';
 import { ChatScrollService } from './services/chat-scroll.service';
-
-/** `emoji-click` from emoji-picker-element (detail.unicode). */
-type EmojiPickerClickEvent = Event & { detail: { unicode?: string } };
+import { ChatFloatPopoversService } from './services/chat-float-popovers.service';
+import { ChatMessageComposerService } from './services/chat-message-composer.service';
 
 @Component({
   selector: 'app-chat',
@@ -39,41 +38,20 @@ type EmojiPickerClickEvent = Event & { detail: { unicode?: string } };
   ],
   templateUrl: './chat.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [ChatScrollService],
+  providers: [ChatScrollService, ChatFloatPopoversService, ChatMessageComposerService],
 })
 export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(ChatMessagesListComponent) private messagesList?: ChatMessagesListComponent;
   @ViewChild('messageInput') private messageInput?: ElementRef<HTMLTextAreaElement>;
 
-  private readonly messageInputMinHeightPx = 48;
-  private readonly messageInputMaxHeightPx = 128;
-
   public profileStore = inject(ProfileStore);
   public chatStore = inject(ChatStore);
   protected readonly chatScroll = inject(ChatScrollService);
+  protected readonly popovers = inject(ChatFloatPopoversService);
+  protected readonly composer = inject(ChatMessageComposerService);
+
   /** First + last name when either is set (for labels under / after email). */
   protected readonly userDisplayName = userDisplayNameFn;
-  public inputedMessage = "";
-
-  /** Fixed popover for incoming message avatar (escapes overflow; positioned from cursor). */
-  protected avatarTooltipSender: UserProfileDetails | null = null;
-  protected senderTooltipLeftPx = 0;
-  protected senderTooltipTopPx = 0;
-  private senderTooltipHideTimer: ReturnType<typeof setTimeout> | null = null;
-
-  /** Emoji picker popover (same hover + delay pattern as sender avatar). */
-  protected emojiTooltipVisible = false;
-  protected emojiTooltipLeftPx = 0;
-  protected emojiTooltipTopPx = 0;
-  private emojiTooltipHideTimer: ReturnType<typeof setTimeout> | null = null;
-
-  private readonly floatTooltipPad = 8;
-  private readonly floatTooltipCursorOff = 12;
-  /** Rough size for first clamp pass; keeps popover inside the viewport. */
-  private readonly senderTooltipEstW = 300;
-  private readonly senderTooltipEstH = 260;
-  private readonly emojiTooltipEstW = 380;
-  private readonly emojiTooltipEstH = 440;
 
   constructor() {
     effect(() => {
@@ -87,8 +65,7 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.clearSenderTooltipHideTimer();
-    this.clearEmojiTooltipHideTimer();
+    this.popovers.dispose();
     this.chatScroll.persistScrollTopOnDestroy(this.messagesList);
   }
 
@@ -109,167 +86,16 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
     return hasProfilePhotoUrl(url);
   }
 
-  protected onSenderAvatarEnter(event: MouseEvent, sender: UserProfileDetails): void {
-    this.clearSenderTooltipHideTimer();
-    this.avatarTooltipSender = sender;
-    this.applySenderTooltipPosition(event);
-  }
-
-  protected onSenderAvatarLeave(): void {
-    this.senderTooltipHideTimer = setTimeout(() => {
-      this.avatarTooltipSender = null;
-      this.senderTooltipHideTimer = null;
-    }, 180);
-  }
-
-  protected onSenderTooltipPopoverEnter(): void {
-    this.clearSenderTooltipHideTimer();
-  }
-
-  protected onSenderTooltipPopoverLeave(): void {
-    this.avatarTooltipSender = null;
-  }
-
-  protected onEmojiTriggerEnter(event: MouseEvent): void {
-    this.clearEmojiTooltipHideTimer();
-    this.emojiTooltipVisible = true;
-    this.applyEmojiTooltipPosition(event);
-  }
-
-  protected onEmojiTriggerLeave(): void {
-    this.emojiTooltipHideTimer = setTimeout(() => {
-      this.emojiTooltipVisible = false;
-      this.emojiTooltipHideTimer = null;
-    }, 180);
-  }
-
-  protected onEmojiTooltipPopoverEnter(): void {
-    this.clearEmojiTooltipHideTimer();
-  }
-
-  protected onEmojiTooltipPopoverLeave(): void {
-    this.emojiTooltipVisible = false;
-  }
-
-  private clearSenderTooltipHideTimer(): void {
-    if (this.senderTooltipHideTimer !== null) {
-      clearTimeout(this.senderTooltipHideTimer);
-      this.senderTooltipHideTimer = null;
-    }
-  }
-
-  private clearEmojiTooltipHideTimer(): void {
-    if (this.emojiTooltipHideTimer !== null) {
-      clearTimeout(this.emojiTooltipHideTimer);
-      this.emojiTooltipHideTimer = null;
-    }
-  }
-
-  private applySenderTooltipPosition(event: MouseEvent): void {
-    const { left, top } = this.positionFloatNearCursor(
-      event,
-      this.senderTooltipEstW,
-      this.senderTooltipEstH,
-    );
-    this.senderTooltipLeftPx = left;
-    this.senderTooltipTopPx = top;
-  }
-
-  private applyEmojiTooltipPosition(event: MouseEvent): void {
-    const { left, top } = this.positionFloatNearCursor(
-      event,
-      this.emojiTooltipEstW,
-      this.emojiTooltipEstH,
-    );
-    this.emojiTooltipLeftPx = left;
-    this.emojiTooltipTopPx = top;
-  }
-
-  /** Above and to the right of the cursor; clamped to the window so nothing is clipped. */
-  private positionFloatNearCursor(
-    event: MouseEvent,
-    estW: number,
-    estH: number,
-  ): { left: number; top: number } {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const cx = event.clientX;
-    const cy = event.clientY;
-    const off = this.floatTooltipCursorOff;
-    const pad = this.floatTooltipPad;
-
-    let left = cx + off;
-    let top = cy - off - estH;
-
-    if (top < pad) {
-      top = cy + off;
-      if (top + estH > vh - pad) {
-        top = Math.max(pad, vh - estH - pad);
-      }
-    } else if (top + estH > vh - pad) {
-      top = Math.max(pad, vh - estH - pad);
-    }
-
-    left = Math.min(left, vw - estW - pad);
-    left = Math.max(pad, left);
-
-    return { left, top };
+  protected adjustMessageInputHeight(): void {
+    this.composer.adjustMessageInputHeight(() => this.messageInput?.nativeElement);
   }
 
   public sendMessage(): void {
-    this.chatStore.sendMessage(this.inputedMessage);
-    this.inputedMessage = "";
-    queueMicrotask(() => {
-      requestAnimationFrame(() => {
-        const el = this.messageInput?.nativeElement;
-        if (el) {
-          el.style.height = `${this.messageInputMinHeightPx}px`;
-        }
-        this.adjustMessageInputHeight();
-      });
-    });
-  }
-
-  protected adjustMessageInputHeight(): void {
-    const el = this.messageInput?.nativeElement;
-    if (!el) {
-      return;
-    }
-    el.style.height = "auto";
-    const h = Math.min(
-      Math.max(el.scrollHeight, this.messageInputMinHeightPx),
-      this.messageInputMaxHeightPx,
-    );
-    el.style.height = `${h}px`;
+    this.composer.sendMessage(() => this.messageInput?.nativeElement);
   }
 
   protected onMessageInputKeydown(event: KeyboardEvent): void {
-    if (event.key !== "Enter" || event.isComposing) {
-      return;
-    }
-    if (event.shiftKey) {
-      return;
-    }
-    if (event.ctrlKey || event.metaKey) {
-      event.preventDefault();
-      const el = this.messageInput?.nativeElement;
-      if (!el) {
-        return;
-      }
-      const start = el.selectionStart ?? 0;
-      const end = el.selectionEnd ?? 0;
-      const v = this.inputedMessage;
-      this.inputedMessage = `${v.slice(0, start)}\n${v.slice(end)}`;
-      queueMicrotask(() => {
-        const pos = start + 1;
-        el.selectionStart = pos;
-        el.selectionEnd = pos;
-        this.adjustMessageInputHeight();
-      });
-      return;
-    }
-    event.preventDefault();
-    this.sendMessage();
+    this.composer.onMessageInputKeydown(event, () => this.messageInput?.nativeElement);
   }
 
   public onScroll(event: Event): void {
@@ -284,13 +110,6 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
   public onWindowKeyDown(event: KeyboardEvent): void {
     if (event.key === 'F5') {
       this.chatScroll.onF5BeforeReload(this.messagesList);
-    }
-  }
-
-  public onEmojiClick(event: EmojiPickerClickEvent): void {
-    const emoji = event.detail.unicode;
-    if (emoji) {
-      this.inputedMessage += emoji;
     }
   }
 }

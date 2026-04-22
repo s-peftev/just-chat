@@ -16,8 +16,8 @@
         [showScrollToBottom]="chatScroll.showScrollToBottom"
         (scrolled)="onScroll($event)"
         (scrollToLatestClick)="scrollToLatest()"
-        (senderAvatarEnter)="onSenderAvatarEnter($event.event, $event.sender)"
-        (senderAvatarLeave)="onSenderAvatarLeave()"
+        (senderAvatarEnter)="popovers.onSenderAvatarEnter($event.event, $event.sender)"
+        (senderAvatarLeave)="popovers.onSenderAvatarLeave()"
       />
 
       <!-- INPUT -->
@@ -25,7 +25,7 @@
         <textarea
           #messageInput
           rows="1"
-          [(ngModel)]="inputedMessage"
+          [(ngModel)]="composer.inputedMessage"
           (input)="adjustMessageInputHeight()"
           (keydown)="onMessageInputKeydown($event)"
           placeholder="Type a message..."
@@ -38,8 +38,8 @@
           class="absolute bottom-3 right-18 flex h-11 w-11 cursor-default items-center 
             justify-center text-xl text-neutral-300/50 transition hover:text-neutral-200"
           aria-label="Emoji picker"
-          (mouseenter)="onEmojiTriggerEnter($event)"
-          (mouseleave)="onEmojiTriggerLeave()"
+          (mouseenter)="popovers.onEmojiTriggerEnter($event)"
+          (mouseleave)="popovers.onEmojiTriggerLeave()"
         >
           <span aria-hidden="true">
             <svg 
@@ -79,14 +79,14 @@
   </div>
 
   <app-float-tooltip
-    [visible]="avatarTooltipSender !== null"
-    [leftPx]="senderTooltipLeftPx"
-    [topPx]="senderTooltipTopPx"
+    [visible]="popovers.avatarTooltipSender !== null"
+    [leftPx]="popovers.senderTooltipLeftPx"
+    [topPx]="popovers.senderTooltipTopPx"
     panelClass="w-max max-w-[min(90vw,18rem)] rounded-2xl border border-white/15 bg-zinc-950/95 p-4 shadow-2xl backdrop-blur-md"
-    (popoverEnter)="onSenderTooltipPopoverEnter()"
-    (popoverLeave)="onSenderTooltipPopoverLeave()"
+    (popoverEnter)="popovers.onSenderTooltipPopoverEnter()"
+    (popoverLeave)="popovers.onSenderTooltipPopoverLeave()"
   >
-    @if (avatarTooltipSender; as sender) {
+    @if (popovers.avatarTooltipSender; as sender) {
       <img
         *ngIf="hasPhotoUrl(sender.profilePhotoUrl)"
         [src]="sender.profilePhotoUrl!"
@@ -110,13 +110,13 @@
   </app-float-tooltip>
 
   <app-float-tooltip
-    [visible]="emojiTooltipVisible"
-    [leftPx]="emojiTooltipLeftPx"
-    [topPx]="emojiTooltipTopPx"
+    [visible]="popovers.emojiTooltipVisible"
+    [leftPx]="popovers.emojiTooltipLeftPx"
+    [topPx]="popovers.emojiTooltipTopPx"
     panelClass="rounded-2xl border border-white/15 bg-zinc-950/95 p-2 shadow-2xl backdrop-blur-md overflow-hidden"
-    (popoverEnter)="onEmojiTooltipPopoverEnter()"
-    (popoverLeave)="onEmojiTooltipPopoverLeave()"
+    (popoverEnter)="popovers.onEmojiTooltipPopoverEnter()"
+    (popoverLeave)="popovers.onEmojiTooltipPopoverLeave()"
   >
-    <emoji-picker (emoji-click)="onEmojiClick($event)"></emoji-picker>
+    <emoji-picker (emoji-click)="composer.onEmojiClick($event)"></emoji-picker>
   </app-float-tooltip>
 </div>
