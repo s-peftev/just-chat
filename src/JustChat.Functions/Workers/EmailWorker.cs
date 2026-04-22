@@ -43,6 +43,7 @@ public class EmailWorker(
         }
         catch (Exception ex)
         {
+            // Suppress the exception to prevent Service Bus from retrying and avoid triggering ACS throttling (429)
             _logger.LogError(ex, "Permanent error for {Recipient}", msg.Email);
         }
     }

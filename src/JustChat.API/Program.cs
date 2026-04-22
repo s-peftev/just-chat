@@ -35,15 +35,11 @@ builder.Host.UseSerilog();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseExceptionHandler(_ => { });
 app.UseHttpsRedirection();
-
 app.UseRouting();
-
 app.UseCors(Policies.DefaultCorsPolicy);
-
-app.UseMiddleware<CorrelationIdMiddleware>();
-
 app.UseAuthentication();
 app.UseAuthorization();
 

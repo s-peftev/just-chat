@@ -16,6 +16,6 @@ public class WelcomeEmailStrategy(ITemplateService templateService) : BaseEmailS
                 { "Email", msg.Email }
             });
 
-        return new EmailContent("Wellcome to JustChat!") { Html = html };
+        return new EmailContent("Welcome to JustChat!") { Html = html };
     }
 }

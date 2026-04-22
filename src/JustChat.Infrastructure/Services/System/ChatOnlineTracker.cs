@@ -6,31 +6,27 @@ namespace JustChat.Infrastructure.Services.System;
 
 public class ChatOnlineTracker : IChatOnlineTracker
 {
-    private readonly ConcurrentDictionary<string, HashSet<string>> _onlineUsers = new();
+    private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, byte>> _onlineUsers = new();
 
     public Task UserConnected(string userId, string connectionId)
     {
-        _onlineUsers.AddOrUpdate(userId,
-            new HashSet<string> { connectionId },
-            (_, set) => {
-                lock (set) { set.Add(connectionId); }
-                return set;
-            });
+        var connections = _onlineUsers.GetOrAdd(userId, _ => new ConcurrentDictionary<string, byte>());
+        connections.TryAdd(connectionId, 0);
 
         return Task.CompletedTask;
     }
 
     public Task UserDisconnected(string userId, string connectionId)
     {
-        if (_onlineUsers.TryGetValue(userId, out var set))
+        if (_onlineUsers.TryGetValue(userId, out var connections))
         {
-            lock (set)
+            connections.TryRemove(connectionId, out _);
+
+            if (connections.IsEmpty)
             {
-                set.Remove(connectionId);
-                if (set.Count == 0) _onlineUsers.TryRemove(userId, out _);
+                _onlineUsers.TryRemove(KeyValuePair.Create(userId, connections));
             }
         }
-
         return Task.CompletedTask;
     }
 
@@ -43,12 +39,9 @@ public class ChatOnlineTracker : IChatOnlineTracker
     {
         const int InitialConnectionCount = 1;
 
-        if (_onlineUsers.TryGetValue(userId, out var set))
+        if (_onlineUsers.TryGetValue(userId, out var userConnections))
         {
-            lock (set)
-            {
-                return Task.FromResult(set.Count == InitialConnectionCount);
-            }
+            return Task.FromResult(userConnections.Count == InitialConnectionCount);
         }
 
         return Task.FromResult(false);

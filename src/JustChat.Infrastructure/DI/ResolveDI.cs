@@ -97,7 +97,7 @@ public static class ResolveDI
             ?? throw new InvalidOperationException("ServiceBus connection string is not configured.");
 
         var emailQueueName = configuration.GetSection("ServiceBusSettings")["EmailQueueName"]
-            ?? throw new ArgumentNullException("EmailQueueName is missing in configuration.");
+            ?? throw new InvalidOperationException("EmailQueueName is missing in configuration.");
 
         services.AddSingleton(sp => new ServiceBusClient(sbConnectionString));
 

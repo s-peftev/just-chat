@@ -141,7 +141,7 @@ public class AccountService(
         return Result.Success();
     }
 
-    public async Task<Result<AuthResultDto>> RefreshToken(string refreshTokenValue, CancellationToken ct = default)
+    public async Task<Result<AuthResultDto>> RefreshTokenAsync(string refreshTokenValue, CancellationToken ct = default)
     {
         var rtResult = await refreshTokenService.GetByTokenValueAsync(refreshTokenValue, ct);
 

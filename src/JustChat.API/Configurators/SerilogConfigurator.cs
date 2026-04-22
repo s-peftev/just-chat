@@ -2,7 +2,7 @@
 
 namespace JustChat.API.Configurators;
 
-public class SerilogConfigurator
+public static class SerilogConfigurator
 {
     public static void Configure()
     {

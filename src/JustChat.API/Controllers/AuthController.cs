@@ -72,7 +72,7 @@ public class AuthController(
         if (string.IsNullOrEmpty(refreshTokenValue))
             return UserErrors.TokenMissing.CreateErrorResponse();
 
-        var result = await accountService.RefreshToken(refreshTokenValue, ct);
+        var result = await accountService.RefreshTokenAsync(refreshTokenValue, ct);
 
         return result.Match(
             data =>

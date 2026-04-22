@@ -53,9 +53,6 @@ public sealed class ApiResponseEnvelopeFilter : IAsyncResultFilter
 
     private static bool IsApiResponseEnvelope(object value)
     {
-        if (value is null)
-            return false;
-
         var type = value.GetType();
 
         return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ApiResponse<>);

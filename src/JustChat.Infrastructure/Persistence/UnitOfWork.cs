@@ -54,8 +54,6 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
             await _transaction.DisposeAsync();
             _transaction = null;
         }
-
-        GC.SuppressFinalize(this);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken ct = default)

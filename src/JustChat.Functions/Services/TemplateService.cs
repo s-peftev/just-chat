@@ -1,6 +1,7 @@
 ﻿using JustChat.Functions.Interfaces;
 using System.Reflection;
 using System.Text;
+using System.Text.Encodings.Web;
 
 namespace JustChat.Functions.Services;
 
@@ -18,10 +19,12 @@ public class TemplateService : ITemplateService
         var html = reader.ReadToEnd();
 
         var sb = new StringBuilder(html);
+        var encoder = HtmlEncoder.Default;
 
         foreach (var item in replacements)
         {
-            sb.Replace("{{" + item.Key + "}}", item.Value);
+            var encodedValue = encoder.Encode(item.Value);
+            sb.Replace("{{" + item.Key + "}}", encodedValue);
         }
 
         return sb.ToString();

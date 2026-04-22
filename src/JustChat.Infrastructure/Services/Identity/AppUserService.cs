@@ -31,10 +31,10 @@ public class AppUserService(
         return Result<UserAuthDto>.Success(new UserAuthDto(user.Id, user.Email!));
     }
 
-    public async Task<Result<UserAuthDto>> RegisterAppUserAsync(string Email, string Password, CancellationToken ct = default)
+    public async Task<Result<UserAuthDto>> RegisterAppUserAsync(string email, string password, CancellationToken ct = default)
     {
-        var user = CreateAppUserForEmail(Email, emailConfirmed: false);
-        var identityResult = await CreateUserAsync(user, Password, ct);
+        var user = CreateAppUserForEmail(email, emailConfirmed: false);
+        var identityResult = await CreateUserAsync(user, password, ct);
 
         if (!identityResult.Succeeded)
             return Result<UserAuthDto>.Failure(MapCreateUserFailureToError(identityResult));
