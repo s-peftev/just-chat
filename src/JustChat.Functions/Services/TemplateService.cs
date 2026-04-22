@@ -9,7 +9,7 @@ public class TemplateService : ITemplateService
     public string GetTemplate(string templateName, Dictionary<string, string> replacements)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = $"{assembly.GetName().Name}.Templates.{templateName}";
+        var resourceName = ResolveEmbeddedTemplateName(assembly, templateName);
 
         using var stream = assembly.GetManifestResourceStream(resourceName)
             ?? throw new FileNotFoundException($"Template {templateName} is not found!");
@@ -25,5 +25,25 @@ public class TemplateService : ITemplateService
         }
 
         return sb.ToString();
+    }
+
+    private static string ResolveEmbeddedTemplateName(Assembly assembly, string templateName)
+    {
+        var suffix = "." + templateName;
+        string? match = null;
+
+        foreach (var name in assembly.GetManifestResourceNames())
+        {
+            if (!name.EndsWith(suffix, StringComparison.Ordinal))
+                continue;
+
+            if (match is not null)
+                throw new InvalidOperationException(
+                    $"Multiple embedded resources end with '{suffix}': '{match}', '{name}'.");
+
+            match = name;
+        }
+
+        return match ?? throw new FileNotFoundException($"Template {templateName} is not found!");
     }
 }
