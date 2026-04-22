@@ -9,8 +9,29 @@
 </head>
 <body>
   <app-root class="layout-wrapper">
-    <div id="pre-bootstrap-loader" class="fixed inset-0 flex items-center justify-center bg-black/10 z-50">
-      <span class="loading loading-ring w-16 h-16 text-lime-500"></span>
+    <div id="pre-bootstrap-loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-black/10 px-4">
+      <span class="loading loading-ring h-16 w-16 text-lime-500"></span>
+      <aside
+        class="flex w-full max-w-md items-start gap-4 rounded-2xl border border-white/10 bg-white/10 p-4 shadow-lg backdrop-blur-md"
+        role="note"
+        aria-label="System note"
+      >
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lime-500/85 text-sm font-bold text-white ring-1 ring-white/20"
+          aria-hidden="true"
+        >
+          i
+        </div>
+        <div class="flex min-w-0 flex-col gap-1.5">
+          <span class="text-[10px] font-bold uppercase tracking-tighter text-brand-accent">System note</span>
+          <p class="text-sm leading-relaxed text-white/85">
+            <span class="font-semibold text-white">Azure cold start:</span>
+            Since we are using free tier services, the back-end might need up to
+            <span class="font-semibold text-white">2 minute</span>
+            to wake up. If you just opened the app, please give it a moment to warm up.
+          </p>
+        </div>
+      </aside>
     </div>
   </app-root>
 </body>
