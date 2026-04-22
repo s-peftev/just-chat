@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace JustChat.API.Filters;
 
+/// <summary>
+/// Wraps successful MVC results in <see cref="ApiResponse{T}"/> so clients always receive a consistent envelope.
+/// Skips wrapping when the payload is already an <see cref="ApiResponse{T}"/> or when the value is an <see cref="Error"/> (converted to a failure envelope).
+/// </summary>
 public sealed class ApiResponseEnvelopeFilter : IAsyncResultFilter
 {
     public Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)

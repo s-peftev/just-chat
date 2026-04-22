@@ -1,3 +1,8 @@
+/**
+ * Attaches the access token and, on 401, runs a single refresh for all parallel requests:
+ * the first caller sets `isRefreshing`, invokes `AuthStore.refresh()`, then publishes the new token on `refreshTokenSubject`;
+ * others wait on that subject and retry with the shared token (avoids refresh storms).
+ */
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { BehaviorSubject, catchError, filter, finalize, Observable, switchMap, take, throwError } from 'rxjs';
 import { AuthStore } from '../../features/auth/store/auth.store';

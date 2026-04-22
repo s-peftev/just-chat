@@ -6,6 +6,9 @@ using System.Net;
 
 namespace JustChat.API.Handlers;
 
+/// <summary>
+/// Maps unhandled exceptions to HTTP status and a failure <see cref="ApiResponse{T}"/> body written as JSON.
+/// </summary>
 public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken ct)
@@ -22,6 +25,10 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         return true;
     }
 
+    /// <summary>
+    /// <see cref="OperationCanceledException"/> is mapped to 400 (client cancellation / aborted request) rather than 499 or 503,
+    /// which keeps the contract simple for API clients that cancel in-flight calls.
+    /// </summary>
     private static (HttpStatusCode statusCode, Error error) GetExceptionDetails(Exception exception)
     {
         return exception switch

@@ -56,6 +56,9 @@ public class TokenService : ITokenService
         return jwtToken;
     }
 
+    /// <summary>
+    /// Produces an opaque refresh token from 64 cryptographically random bytes, Base64-encoded for storage and transport (high entropy, URL-safe enough for cookie use).
+    /// </summary>
     public RefreshToken GenerateRefreshToken(RefreshTokenGenerationDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.UserId))

@@ -19,6 +19,10 @@ public class EmailWorker(
     private readonly IEnumerable<IEmailStrategy> _strategies = strategies;
     private readonly ILogger<EmailWorker> _logger = logger;
 
+    /// <summary>
+    /// Resolves an <see cref="IEmailStrategy"/> by message type, sends via ACS Email, and swallows exceptions so the message completes
+    /// (avoids Service Bus retries and ACS throttling loops for failures treated as permanent at the business level).
+    /// </summary>
     [Function("SendEmail")]
     public async Task Run([ServiceBusTrigger(WorkerConfig.EmailQueueName, Connection = WorkerConfig.ServiceBusConnection)] EmailNotification msg)
     {

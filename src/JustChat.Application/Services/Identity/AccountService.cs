@@ -41,6 +41,10 @@ public class AccountService(
         return await AuthenticateUserAsync(authResult.Value, ct: ct);
     }
 
+    /// <summary>
+    /// Validates the Google ID token, provisions or links the user inside a DB transaction, then optionally creates/updates profile
+    /// (including Google <c>picture</c> when the profile has no photo). Publishes welcome email only for brand-new Google users.
+    /// </summary>
     public async Task<Result<AuthResultDto>> LoginWithGoogleAsync(GoogleLoginRequest request, CancellationToken ct = default)
     {
         var payloadResult = await googleIdTokenReader.ValidateAndReadAsync(request.IdToken, ct);
@@ -141,6 +145,10 @@ public class AccountService(
         return Result.Success();
     }
 
+    /// <summary>
+    /// Returns new tokens when valid. If the refresh token is within <see cref="RefreshTokenOptions.RotationThresholdDays"/> of expiry,
+    /// the current token is revoked and a full re-auth issues a new refresh token (rotation); otherwise the same refresh cookie value is returned with a new JWT.
+    /// </summary>
     public async Task<Result<AuthResultDto>> RefreshTokenAsync(string refreshTokenValue, CancellationToken ct = default)
     {
         var rtResult = await refreshTokenService.GetByTokenValueAsync(refreshTokenValue, ct);
@@ -252,6 +260,7 @@ public class AccountService(
         return new AuthResultDto(accessTokenDto, refreshTokenInfoDto);
     }
 
+    /// <summary>True when remaining lifetime is below the configured rotation threshold (proactive refresh-token rotation).</summary>
     private bool IsTimeToRotateToken(RefreshToken refreshToken) =>
             (refreshToken.ExpiresAtUtc - dateTimeProvider.UtcNow)
                 < TimeSpan.FromDays(refreshTokenOptions.Value.RotationThresholdDays);

@@ -12,6 +12,10 @@ public class AzureSentimentService(
     ILogger<AzureSentimentService> logger
     ) : ISentimentService
 {
+    /// <summary>
+    /// Whitespace-only input is treated as <see cref="Sentiment.Neutral"/> without calling Azure. On provider errors, returns
+    /// <see cref="GeneralErrors.ServiceUnavailable"/> so callers can degrade gracefully instead of surfacing raw exceptions.
+    /// </summary>
     public async Task<Result<Sentiment>> AnalyzeSentimentAsync(string text, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(text)) 

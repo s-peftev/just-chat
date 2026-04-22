@@ -27,8 +27,10 @@ public class Result
         _error = error;
     }
 
+    /// <summary>Creates a successful result with no attached error.</summary>
     public static Result Success() => new(true, null);
 
+    /// <summary>Creates a failed result carrying the given <paramref name="error"/>.</summary>
     public static Result Failure(Error error) => new(false, error);
 
     /// <summary>

@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JustChat.Infrastructure.Persistence;
 
+/// <summary>
+/// Identity + app entities. All <see cref="DateTime"/> properties use a value converter so values read from the store are marked <see cref="DateTimeKind.Utc"/>.
+/// </summary>
 public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityUserContext<AppUser>(options)
 {
@@ -19,6 +22,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         builder.Ignore<IdentityUserClaim<string>>();
         builder.Ignore<IdentityUserToken<string>>();
 
+        // EF may return Unspecified DateTimes from the provider; normalize to UTC so app code and comparisons behave consistently.
         var utcConverter = new ValueConverter<DateTime, DateTime>(
                 v => v,
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc)

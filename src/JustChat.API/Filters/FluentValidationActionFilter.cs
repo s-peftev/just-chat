@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace JustChat.API.Filters;
 
+/// <summary>
+/// Runs FluentValidation for each non-null action argument by resolving <c>IValidator&lt;T&gt;</c> from DI,
+/// where <c>T</c> is the runtime type of the argument (<see cref="Type.MakeGenericType"/> on <see cref="IValidator{T}"/>).
+/// </summary>
 public class FluentValidationActionFilter(IServiceProvider serviceProvider)
         : IAsyncActionFilter
 {

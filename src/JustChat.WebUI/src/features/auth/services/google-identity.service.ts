@@ -9,6 +9,10 @@ const WIDTH_CHANGE_THRESHOLD_PX = 2;
 /** Used only when the host still reports zero width after layout retries. */
 const FALLBACK_BUTTON_WIDTH_PX = 400;
 
+/**
+ * Loads Google Identity Services once, renders the official button outside Angular change detection, and uses double `requestAnimationFrame`
+ * after script load so layout has settled before measuring the host. `dispose` / `mountSignInButton` tear down prior observers and DOM so route changes get a clean host.
+ */
 @Injectable({
   providedIn: 'root',
 })

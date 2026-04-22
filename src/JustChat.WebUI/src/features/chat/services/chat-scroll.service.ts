@@ -8,6 +8,11 @@ import { ChatMessagesListComponent } from '../components/chat-messages-list/chat
 const CHAT_SCROLL_TOP_STORAGE_KEY = 'chat:scrollTop';
 const CHAT_SCROLL_TO_BOTTOM_ON_LOAD_KEY = 'chat:scrollToBottomOnLoad';
 
+/**
+ * Owns chat list scroll behavior: restore `scrollTop` from `sessionStorage` after navigation, optional “scroll to bottom on F5 reload”,
+ * auto-scroll when the user is near the bottom or sent the last message, preserve position when loading older messages (height delta + rAF),
+ * and track “near bottom” from visible rows for the scroll-to-latest affordance.
+ */
 @Injectable()
 export class ChatScrollService {
   private readonly chatStore = inject(ChatStore);

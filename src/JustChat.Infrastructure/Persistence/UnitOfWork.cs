@@ -4,9 +4,14 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace JustChat.Infrastructure.Persistence;
 
+/// <summary>
+/// Transaction scope for a single <see cref="AppDbContext"/> instance. <see cref="BeginTransactionAsync"/> is idempotent while a transaction is open;
+/// commit/rollback always dispose the underlying transaction so a subsequent begin starts fresh.
+/// </summary>
 public class UnitOfWork(AppDbContext context) : IUnitOfWork
 {
     private IDbContextTransaction? _transaction;
+    /// <summary>No-op if a transaction is already active (nested callers do not start a second transaction).</summary>
     public async Task BeginTransactionAsync(CancellationToken ct = default)
     {
         if (_transaction != null)

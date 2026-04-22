@@ -5,8 +5,12 @@ using System.Text.Encodings.Web;
 
 namespace JustChat.Functions.Services;
 
+/// <summary>
+/// Loads HTML email templates from embedded resources and replaces <c>{{key}}</c> placeholders with HTML-encoded values.
+/// </summary>
 public class TemplateService : ITemplateService
 {
+    /// <param name="templateName">Short name (e.g. file stem); matched against embedded resource names via <see cref="ResolveEmbeddedTemplateName"/>.</param>
     public string GetTemplate(string templateName, Dictionary<string, string> replacements)
     {
         var assembly = Assembly.GetExecutingAssembly();
@@ -30,6 +34,10 @@ public class TemplateService : ITemplateService
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Embedded resources are fully qualified (namespace + file name). This picks the single resource whose name ends with
+    /// <c>.{templateName}</c> and throws if none or more than one match to avoid loading the wrong template.
+    /// </summary>
     private static string ResolveEmbeddedTemplateName(Assembly assembly, string templateName)
     {
         var suffix = "." + templateName;

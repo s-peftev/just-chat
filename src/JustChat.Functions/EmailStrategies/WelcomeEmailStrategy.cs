@@ -5,6 +5,9 @@ using JustChat.Functions.Interfaces;
 
 namespace JustChat.Functions.EmailStrategies;
 
+/// <summary>
+/// Welcome email: loads the embedded HTML template via <see cref="ITemplateService"/> and fills the <c>Email</c> placeholder for the recipient.
+/// </summary>
 public class WelcomeEmailStrategy(ITemplateService templateService) : BaseEmailStrategy
 {
     public override EmailType Type => EmailType.Welcome;

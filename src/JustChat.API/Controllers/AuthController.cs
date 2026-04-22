@@ -47,6 +47,9 @@ public class AuthController(
             error => error.CreateErrorResponse());
     }
 
+    /// <summary>
+    /// Clears the refresh cookie and revokes the token when present. Missing cookie returns <c>TokenMissing</c> without deleting the cookie again (idempotent from the client perspective).
+    /// </summary>
     [HttpPost("logout")]
     public async Task<IActionResult> Logout(CancellationToken ct)
     {

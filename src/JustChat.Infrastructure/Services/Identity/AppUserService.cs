@@ -100,6 +100,10 @@ public class AppUserService(
             : Result.Success();
     }
 
+    /// <summary>
+    /// Resolves the user by external login, by email (linking Google to an existing account), or creates a new confirmed user with Google login.
+    /// <see cref="GoogleUserProvisionResultDto.RequiresUserProfile"/> is true only for the new-user path so callers can seed profile and welcome flows.
+    /// </summary>
     public async Task<Result<GoogleUserProvisionResultDto>> ProvisionGoogleUserAsync(GoogleIdTokenPayload payload, CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();

@@ -13,6 +13,10 @@ public class ProfilePhotoImageProcessor(
     IOptions<ProfilePhotoProcessingOptions> options
     ) : IProfilePhotoImageProcessor
 {
+    /// <summary>
+    /// Pipeline: copy to buffer, decode with ImageSharp, center-crop resize to configured dimensions, encode as lossy WebP into a new stream.
+    /// Invalid or corrupt images map to validation-style errors; unexpected failures return a generic processing error.
+    /// </summary>
     public async Task<Result<MemoryStream>> ProcessAsync(Stream source, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(source);

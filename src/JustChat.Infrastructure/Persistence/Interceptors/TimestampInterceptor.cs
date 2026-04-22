@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace JustChat.Infrastructure.Persistence.Interceptors;
 
+/// <summary>
+/// Sets <see cref="IHasTimestamps.UpdatedAt"/> (and <see cref="IHasTimestamps.CreatedAt"/> for new entities) before save.
+/// </summary>
 public class TimestampInterceptor(IDateTimeProvider dateTimeProvider) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
@@ -21,6 +24,10 @@ public class TimestampInterceptor(IDateTimeProvider dateTimeProvider) : SaveChan
         return base.SavingChangesAsync(eventData, result, ct);
     }
 
+    /// <summary>
+    /// For <see cref="EntityState.Added"/>, both <c>CreatedAt</c> and <c>UpdatedAt</c> are set so the row has a defined "last changed" time
+    /// from insert onward; for <see cref="EntityState.Modified"/>, only <c>UpdatedAt</c> is refreshed.
+    /// </summary>
     private void UpdateTimestamps(DbContext? context)
     {
         if (context == null) return;
